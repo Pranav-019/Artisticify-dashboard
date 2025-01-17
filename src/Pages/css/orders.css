@@ -1,0 +1,58 @@
+/* Orders Tab Styling */
+.order-tab {
+    position: fixed;
+    bottom: 1%;
+    right: 5%;
+    width: 900px;
+    max-height: 650px; /* Set a fixed height */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    padding: 10px;
+    z-index: 999;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    animation: slideIn 0.5s ease-out;
+  }
+  
+  /* Animation for Orders Tab */
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  /* Tab Header Styling */
+  .order-tab .card-header {
+    background-color: #007bff;  /* Blue header */
+    color: white;
+    font-weight: bold;
+    font-size: 1.25rem;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  /* Tab Footer Styling */
+  .order-tab .card-footer {
+    background-color: #28a745; /* Green footer */
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  /* Close Button Styling */
+  .order-tab .btn-secondary {
+    background-color: #dc3545;  /* Red close button */
+    border-color: #dc3545;
+  }
+  
+  .order-tab .btn-secondary:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+  }
+  

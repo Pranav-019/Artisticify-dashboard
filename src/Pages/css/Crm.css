@@ -1,0 +1,260 @@
+/* Container styling */
+.crm-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 30px;
+  background-color: #f7f7f7; /* Light background for the dashboard */
+}
+
+/* Column styling */
+.crm-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading and Subheading styling */
+.heading, .subheading {
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 10px;
+}
+
+.subheading {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Table container for responsiveness */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 30px; /* Add space above table */
+}
+
+/* Table styling */
+.table-heading {
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 20px;
+  text-align: left;
+  color: #333;
+}
+
+.leads-table {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Table Header Styling */
+.leads-table th {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* Table Body Styling */
+.leads-table td {
+  padding: 12px;
+  font-size: 14px;
+  text-align: center;
+  height: 50px;
+  word-wrap: break-word;
+}
+
+/* Table Row Hover Effect */
+.leads-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Form Section styling */
+form {
+  width: 100%;
+  margin-top: 30px;
+}
+
+/* Button styling */
+button {
+  font-family: 'Roboto', sans-serif;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: none;
+}
+
+.downloadCSV button {
+  width: 100%;
+  margin-top: 20px;
+  background-color: #28a745;
+  color: white;
+}
+
+/* Follow-Up Section styling */
+.follow-up-section {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+}
+
+.follow-up-section h4 {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.follow-up-section textarea {
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 100%;
+  font-size: 14px;
+}
+
+/* CRM Filters Section */
+/* CRM Filters Section */
+/* CRM Filters Section */
+.crm-filters {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.crm-filters button {
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  padding: 8px 15px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-right: 20px; /* Add space between buttons */
+}
+
+.crm-filters button:hover {
+  background-color: #0056b3;
+}
+
+/* Jitsi Meeting styling */
+.meeting-container iframe {
+  height: 600px;
+  width: 100%;
+  display: block;
+  border: none;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .leads-table th, .leads-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .crm-container {
+    padding: 15px;
+  }
+
+  .leads-table {
+    width: 100%;
+  }
+
+  .crm-column {
+    padding: 15px;
+  }
+
+  .follow-up-section textarea {
+    font-size: 12px;
+  }
+
+  .crm-filters button {
+    font-size: 12px;
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .heading, .subheading {
+    font-size: 1rem;
+  }
+
+  .follow-up-section h4 {
+    font-size: 1rem;
+  }
+}
+
+
+/* Lead Tab Styling */
+.lead-tab {
+  position: fixed;
+  bottom: 1%;
+  right: 5%;
+  width: 900px;
+  max-height: 650px; /* Set a fixed height */
+  overflow-y: auto;  /* Enable vertical scrolling */
+  padding: 10px;
+  z-index: 999;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  animation: slideIn 0.5s ease-out;
+}
+
+/* Animation for Tab */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Tab Header Styling */
+.lead-tab .card-header {
+  background-color: #007bff;  /* Blue header */
+  color: white;
+  font-weight: bold;
+  font-size: 1.25rem;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Tab Footer Styling */
+.lead-tab .card-footer {
+  background-color: #28a745; /* Green footer */
+  color: white;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Close Button Styling */
+.lead-tab .btn-secondary {
+  background-color: #dc3545;  /* Red close button */
+  border-color: #dc3545;
+}
+
+.lead-tab .btn-secondary:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+
