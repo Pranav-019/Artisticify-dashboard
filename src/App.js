@@ -25,11 +25,9 @@ import {
 import './App.css';
 import Crm from './Pages/Crm';
 import Packages from './Pages/Packages';
-import ourWork from './Pages/ourWork';
-import Newsletter from './Pages/newsLetter';
-
-import { useStateContext } from './Contexts/ContextProvider';
 import OurWork from './Pages/ourWork';
+import Newsletter from './Pages/newsLetter';
+import { useStateContext } from './Contexts/ContextProvider';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -55,20 +53,49 @@ const App = () => {
     }
   }, [setCurrentColor, setCurrentMode]);
 
+  // Handle logout by clearing authentication data
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated'); // Clear authentication state
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('colorMode');
+    localStorage.removeItem('themeMode');
   };
 
+  // Handle login by setting authentication data
   const handleLogin = () => {
     setIsAuthenticated(true);
-    localStorage.setItem('isAuthenticated', true); // Persist authentication state
+    localStorage.setItem('isAuthenticated', true);
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (sessionStorage.getItem('isTabClosed')) {
+        handleLogout();
+      }
+    };
+
+    // Set flag when the page is being closed
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.setItem('isTabClosed', 'true');
+    });
+
+    if (!sessionStorage.getItem('isTabClosed')) {
+      sessionStorage.setItem('isTabClosed', 'false');
+    }
+
+    // Cleanup event listener
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      sessionStorage.removeItem('isTabClosed');
+    };
+  }, []);
+
+  // If the user is not authenticated, show the login form
   if (!isAuthenticated) {
     return <LoginForm onLogin={handleLogin} />;
   }
 
+  // Otherwise, show the main application dashboard
   return (
     <div className={currentMode === 'Dark' ? 'dark' : ''}>
       <div className="flex relative dark:bg-main-dark-bg">
@@ -116,7 +143,6 @@ const App = () => {
               <Route path="/Packages" element={<Packages />} />
               <Route path="/Our-Work" element={<OurWork />} />
               <Route path="/NewsLetter" element={<Newsletter />} />
-              
               {/* apps */}
               <Route path="/kanban" element={<Kanban />} />
               <Route path="/calendar" element={<Calendar />} />
@@ -155,11 +181,11 @@ const LoginForm = ({ onLogin }) => {
           { password }
         );
         if (response.data) {
-          onLogin(); // Call the onLogin prop passed from App
+          onLogin(); // Call onLogin when successful login
         }
       } catch (err) {
         if (err.response) {
-          setError(err.response.data.error); // Error message from the backend
+          setError(err.response.data.error); // Show error message from backend
         } else {
           setError('An unexpected error occurred');
         }
@@ -172,7 +198,7 @@ const LoginForm = ({ onLogin }) => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-w-xs">
-        <h2 className="text-3xl font-semibold text-center text-gray-700 mb-4">Login</h2>
+        <h2 className="text-3xl font-semibold text-center text-gray-700 mb-4">Artisticify Dashboard</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-600">User ID</label>

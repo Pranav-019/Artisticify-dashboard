@@ -11,7 +11,13 @@ import { TiTick } from 'react-icons/ti';
 import { GiLouvrePyramid } from 'react-icons/gi';
 import { GrLocation } from 'react-icons/gr';
 import { FaPaintBrush, FaCogs } from "react-icons/fa";  // Design icons
-import { GiMegaphone } from "react-icons/gi";  // Digital marketing icon
+import { GiMegaphone } from "react-icons/gi";  
+import { GiNewspaper } from "react-icons/gi";
+import { TbPackages } from "react-icons/tb";
+import { MdWork } from "react-icons/md";
+import { RiCustomerService2Line } from "react-icons/ri";
+import { FaMoneyBillTrendUp } from "react-icons/fa6";
+
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';
 import avatar3 from './avatar3.png';
@@ -477,7 +483,7 @@ export const links = [
     links: [
       {
         name: 'Revenue',
-        icon: <FiShoppingBag />,
+        icon: <FaMoneyBillTrendUp />,
       },
     ],
   },
@@ -491,11 +497,11 @@ export const links = [
       },
       {
         name: 'Packages',
-        icon: <GiMegaphone/>,
+        icon: <TbPackages/>,
       },
       {
-        name: 'Our-Work',
-        icon: <GiMegaphone/>,
+        //name: 'Our-Work',
+       // icon: <MdWork/>,
       },
     ],
   },
@@ -504,7 +510,7 @@ export const links = [
     links: [
       {
         name: 'CRM',
-        icon: <FiEdit />,
+        icon: <RiCustomerService2Line />,
       },
       {
         name: 'color-picker',
@@ -513,7 +519,7 @@ export const links = [
 
       {
         name: 'NewsLetter',
-        icon: <FiEdit />,
+        icon: <GiNewspaper />,
       },
     ],
   },

@@ -35,7 +35,7 @@ const Crm = () => {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/contact");
+        const response = await fetch("https://artisticify-backend.vercel.app/api/contact");
         if (!response.ok) throw new Error("Failed to fetch leads");
         const data = await response.json();
         setLeads(data);
@@ -102,7 +102,7 @@ const Crm = () => {
 
   const updateLeadField = async (id, field, value) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/contact/${id}`, {
+      const response = await fetch(`https://artisticify-backend.vercel.app/api/contact/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -141,7 +141,7 @@ const Crm = () => {
     const newFollowUp = followUpComment;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/contact/${selectedLead._id}`, {
+      const response = await fetch(`https://artisticify-backend.vercel.app/contact/${selectedLead._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

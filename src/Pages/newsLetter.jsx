@@ -16,7 +16,7 @@ const Newsletter = () => {
     }
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:5000/api/newsletter/send', { subject, message });
+      const response = await axios.post('https://artisticify-backend.vercel.app/api/newsletter/send', { subject, message });
       setStatus('Promotional email sent successfully!');
       setLoading(false);
     } catch (error) {

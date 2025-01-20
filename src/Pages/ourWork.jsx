@@ -2,66 +2,116 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const OurWork = () => {
-  const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]);  // Handle multiple image files
+  const [imageUrls, setImageUrls] = useState("");  // For multiple image URLs
 
-  const fetchCategories = async () => {
+  const fetchCategory = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/ourwork");
-      setCategories(response.data);
+      const response = await axios.get("https://artisticify-backend.vercel.app/api/ourwork/get");
+      setCategory(response.data.works || []);  // Ensure category is always an array
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Error fetching category:", error);
     }
   };
 
   const addImage = async () => {
-    if (!image) {
-      alert("Please select an image to upload.");
+    if (images.length === 0 && !imageUrls) {  // Ensure at least one image or URL is provided
+      alert("Please select an image or enter image URL(s).");
       return;
     }
+  
     const formData = new FormData();
     formData.append("category", selectedCategory);
-    if (selectedCategory === "Stationary") {
+  
+    // Handle subcategory if present
+    if (selectedCategory === "stationary") {
       formData.append("subCategory", subCategory);
     }
-    formData.append("image", image);
-
-    try {
-      await axios.post("http://localhost:5000/api/ourwork/add", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+  
+    // Handle image files if selected
+    if (images.length > 0) {
+      images.forEach((image) => {
+        formData.append("images", image);  // Append each image in the images array
       });
-      alert("Image added successfully!");
+    }
+  
+    // Handle image URLs if provided
+    if (imageUrls) {
+      formData.append("imageUrls", imageUrls);  // Use "imageUrls" for multiple URLs
+    }
+  
+    try {
+      // Find the category by selectedCategory using its _id
+      const categoryToUpdate = category.find((cat) => cat.category === selectedCategory);
+  
+      if (categoryToUpdate) {
+        console.log("Updating category:", categoryToUpdate);  // Debug log to inspect the category object
+        // Update existing category
+        const response = await axios.put(
+          `https://artisticify-backend.vercel.app/api/ourwork/update/${categoryToUpdate._id}`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        console.log("Response from API:", response);  // Log API response for debugging
+        alert("Image(s) added successfully to the existing category!");
+      } else {
+        // Create a new category
+        const response = await axios.post(
+          "https://artisticify-backend.vercel.app/api/ourwork/insert",
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        console.log("Response from API (new category):", response);  // Log API response for debugging
+        alert("New category created and image(s) added successfully!");
+      }
+  
       setSelectedCategory(""); // Reset the selected category
       setSubCategory(""); // Reset the selected subcategory
-      setImage(null); // Reset the image
-      fetchCategories(); // Refresh the categories
+      setImages([]); // Reset the images array
+      setImageUrls(""); // Reset the imageUrls
+      fetchCategory(); // Refresh the categories
     } catch (error) {
-      console.error("Error adding image:", error);
-      alert("Failed to add image.");
+      console.error("Error adding image(s):", error);
+      alert("Failed to add image(s).");
     }
   };
+  
 
-  const deleteImage = async (category, subCategory, imageUrl) => {
+  const deleteImage = async (id) => {
     try {
-      await axios.delete("http://localhost:5000/api/ourwork/delete", {
-        data: { category, subCategory, imageUrl },
-      });
+      await axios.delete(`https://artisticify-backend.vercel.app/api/ourwork/delete/${id}`);
       alert("Image deleted successfully!");
-      fetchCategories();
+      fetchCategory();
     } catch (error) {
       console.error("Error deleting image:", error);
       alert("Failed to delete image.");
     }
   };
 
+  const deleteCategory = async (id) => {
+    try {
+      await axios.delete(`https://artisticify-backend.vercel.app/api/ourwork/delete/${id}`);
+      alert("Category deleted successfully!");
+      fetchCategory();
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      alert("Failed to delete category.");
+    }
+  };
+
   const handleFileChange = (e) => {
-    setImage(e.target.files[0]);
+    setImages([...e.target.files]);  // Store multiple selected files
+  };
+
+  const handleUrlChange = (e) => {
+    setImageUrls(e.target.value);  // Set the imageUrls for multiple URLs
   };
 
   useEffect(() => {
-    fetchCategories();
+    fetchCategory();
   }, []);
 
   return (
@@ -87,20 +137,20 @@ const OurWork = () => {
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
                 <option value="">-- Select --</option>
-                <option value="Logo">Logo</option>
-                <option value="Brochure">Brochure</option>
-                <option value="Poster">Poster</option>
-                <option value="Flyer">Flyer</option>
-                <option value="Packaging">Packaging</option>
-                <option value="UI/UX">UI/UX</option>
-                <option value="Icon">Icon</option>
-                <option value="Magazine">Magazine</option>
-                <option value="Visual Aid">Visual Aid</option>
-                <option value="Stationary">Stationary</option>
+                <option value="logo">logo</option>
+                <option value="brochure">brochure</option>
+                <option value="poster">poster</option>
+                <option value="flyer">flyer</option>
+                <option value="packaging">packaging</option>
+                <option value="ui/ux">ui/ux</option>
+                <option value="icon">icon</option>
+                <option value="magazine">magazine</option>
+                <option value="visual Aid">visual Aid</option>
+                <option value="stationary">stationary</option>
               </select>
             </div>
 
-            {selectedCategory === "Stationary" && (
+            {selectedCategory === "stationary" && (
               <div>
                 <label className="block text-gray-600 font-medium">
                   Select Subcategory:
@@ -111,18 +161,35 @@ const OurWork = () => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <option value="">-- Select --</option>
-                  <option value="Envelope">Envelope</option>
-                  <option value="Menu-Card">Menu-Card</option>
-                  <option value="Certificate">Certificate</option>
+                  <option value="envelope">envelope</option>
+                  <option value="menu-card">menu-card</option>
+                  <option value="certificate">certificate</option>
                 </select>
               </div>
             )}
 
             <div>
+              <label className="block text-gray-600 font-medium">
+                Select Image(s):
+              </label>
               <input
                 type="file"
                 onChange={handleFileChange}
                 className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                multiple // Allow multiple file selection
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-600 font-medium">
+                Or enter Image URL(s) (comma-separated):
+              </label>
+              <input
+                type="text"
+                value={imageUrls}
+                onChange={handleUrlChange}
+                className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter Image URLs, separated by commas"
               />
             </div>
 
@@ -140,59 +207,79 @@ const OurWork = () => {
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
             All Categories
           </h2>
-          {categories.map((category) => (
-            <div key={category.name} className="mb-6">
-              <h3 className="text-xl font-semibold text-blue-600 mb-2">
-                {category.name}
-              </h3>
-              {category.name === "Stationary" ? (
-                category.subCategories.map((sub) => (
-                  <div key={sub.name} className="mb-4">
-                    <h4 className="text-lg font-medium text-gray-800 mb-2">
-                      {sub.name}
-                    </h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {sub.images.map((img, index) => (
-                        <div key={index} className="relative group">
+          {category && category.length > 0 ? (
+            category.map((cat) => (
+              <div key={cat._id} className="mb-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-semibold text-blue-600 mb-2">
+                    {cat.category}
+                  </h3>
+                  <button
+                    onClick={() => deleteCategory(cat._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                  >
+                    Delete Category
+                  </button>
+                </div>
+
+                {/* Ensure subCategory is an array */}
+                {Array.isArray(cat.subCategory) && cat.subCategory.length > 0 ? (
+                  cat.subCategory.map((sub) => (
+                    <div key={sub._id} className="mb-4">
+                      <h4 className="text-lg font-medium text-gray-800 mb-2">
+                        {sub.subCategory}
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {sub.images && sub.images.length > 0 ? (
+                          sub.images.map((img) => (
+                            <div key={img._id} className="relative group">
+                              <img
+                                src={img.imageUrl}
+                                alt={sub.subCategory}
+                                className="rounded-lg shadow-md"
+                              />
+                              <button
+                                onClick={() => deleteImage(img._id)}
+                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))
+                        ) : (
+                          <p>No images available.</p>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {cat.images && cat.images.length > 0 ? (
+                      cat.images.map((img) => (
+                        <div key={img._id} className="relative group">
                           <img
-                            src={img}
-                            alt={sub.name}
+                            src={img.imageUrl}
+                            alt={cat.category}
                             className="rounded-lg shadow-md"
                           />
                           <button
-                            onClick={() =>
-                              deleteImage(category.name, sub.name, img)
-                            }
+                            onClick={() => deleteImage(img._id)}
                             className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100"
                           >
                             ✕
                           </button>
                         </div>
-                      ))}
-                    </div>
+                      ))
+                    ) : (
+                      <p>No images available.</p>
+                    )}
                   </div>
-                ))
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {category.images.map((img, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={img}
-                        alt={category.name}
-                        className="rounded-lg shadow-md"
-                      />
-                      <button
-                        onClick={() => deleteImage(category.name, null, img)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No categories available.</p>
+          )}
         </div>
       </div>
     </div>
