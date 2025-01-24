@@ -20,7 +20,7 @@ import {
   Pie,
   Financial,
   ColorPicker,
-  ColorMapping,
+  ColorMapping
 } from './Pages';
 import './App.css';
 import Crm from './Pages/Crm';
@@ -28,6 +28,7 @@ import Packages from './Pages/Packages';
 import OurWork from './Pages/ourWork';
 import Newsletter from './Pages/newsLetter';
 import { useStateContext } from './Contexts/ContextProvider';
+import Design from './Pages/Design';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -142,6 +143,7 @@ const App = () => {
               <Route path="/crm" element={<Crm />} />
               <Route path="/Packages" element={<Packages />} />
               <Route path="/Our-Work" element={<OurWork />} />
+              <Route path="/design-drop" element={<Design/>} />
               <Route path="/NewsLetter" element={<Newsletter />} />
               {/* apps */}
               <Route path="/kanban" element={<Kanban />} />

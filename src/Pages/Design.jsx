@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Container, Image, Table } from "react-bootstrap";
 
-const OurWork = () => {
+function Design() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -12,10 +12,12 @@ const OurWork = () => {
   const fetchOurWorks = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/ourwork/fetch"
+        "http://localhost:5000/api/design/fetch"
       );
+
+      console.log("Response for fetch : ", response);
       if (response.data.success) {
-        setOurWorks(response.data.ourWorks);
+        setOurWorks(response.data.ourDesign);
       } else {
         console.error("Failed to fetch Our Work items:", response.data.message);
       }
@@ -40,11 +42,11 @@ const OurWork = () => {
 
     const formData = new FormData();
     formData.append("category", selectedCategory);
-    formData.append("imageUrls", selectedFile); // "imageUrls" matches the key in your backend
+    formData.append("imageUrls", selectedFile);
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/ourwork/insert",
+        "http://localhost:5000/api/design/insert",
         formData,
         {
           headers: {
@@ -66,11 +68,11 @@ const OurWork = () => {
   const deleteCategory = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/ourwork/delete/${id}`
+        `http://localhost:5000/api/design/delete/${id}`
       );
       console.log("Response for Delete : ", response);
       if (response.data.success) {
-        alert("Category deleted successfully!");
+        alert("Category and Image deleted successfully!");
         fetchOurWorks();
       } else {
         alert("Failed to delete category.");
@@ -81,43 +83,6 @@ const OurWork = () => {
     }
   };
 
-  const editCategory = async (id) => {
-    if (!selectedCategory) {
-      alert("Please enter a category name to update.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("category", selectedCategory);
-    if (selectedFile) {
-      formData.append("imageUrls", selectedFile);
-    }
-
-    try {
-      const response = await axios.put(
-        `http://localhost:5000/api/ourwork/update/${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response.data.success) {
-        alert("Category updated successfully!");
-        fetchOurWorks();
-        setEditingCategoryId(null);
-        setSelectedCategory("");
-        setSelectedFile(null);
-      } else {
-        alert("Failed to update category.");
-      }
-    } catch (error) {
-      console.error("Error updating category:", error);
-      alert("Error occurred while updating the category.");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 py-10">
       <div className="max-w-7xl mx-auto px-6">
@@ -125,7 +90,7 @@ const OurWork = () => {
           className="text-4xl font-bold text-center text-blue-600 mb-8"
           style={{ color: "#03c9d7" }}
         >
-          Our Work
+          Design
         </h1>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-10">
@@ -143,16 +108,23 @@ const OurWork = () => {
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
                 <option value="">-- Select --</option>
-                <option value="logo">logo</option>
-                <option value="brochure">brochure</option>
-                <option value="poster">poster</option>
-                <option value="flyer">flyer</option>
-                <option value="packaging">packaging</option>
-                <option value="ui/ux">ui/ux</option>
-                <option value="icon">icon</option>
-                <option value="magazine">magazine</option>
-                <option value="visual Aid">visual Aid</option>
-                <option value="stationary">stationary</option>
+                <option value="logo-design">logo-design</option>
+                <option value="brochure-design">brochure-design</option>
+                <option value="flyer-design">flyer-design</option>
+                <option value="packaging-design">packaging-design</option>
+                <option value="icon-design">icon-design</option>
+                <option value="uiux-design">uiux-design</option>
+                <option value="stationary-design">stationary-design</option>
+                <option value="magazine-design">magazine-design</option>
+                <option value="visualAid-design">visualAid-design</option>
+                <option value="poster-design">poster-design</option>
+
+                <option value="calendar-design">calendar-design</option>
+                <option value="letterHead-design">letterHead-design</option>
+                <option value="envelope-design">envelope-design</option>
+                <option value="visitingCard-design">visitingCard-design</option>
+                <option value="certificate-design">certificate-design</option>
+                <option value="menuCard-design">menuCard-design</option>
               </select>
             </div>
 
@@ -195,22 +167,18 @@ const OurWork = () => {
                         src={`data:${image.contentType};base64,${image.data}`}
                         alt={`${work.category} ${index}`}
                         className="rounded object-cover"
-                        style={{ width: "70px", height: "70px" }}
+                        style={{
+                          width: "70px",
+                          height: "70px",
+                          border: "1px solid #ccc",
+                        }}
                       />
                     ))}
                   </div>
                 </div>
 
+                {/* Delete Button */}
                 <div className="col-lg-5 col-md-3 col-sm-12 d-flex justify-content-start justify-content-md-end gap-2">
-                  {/* <Button
-                  // variant=""
-                  className="me-2 bg-blue-600"
-                  onClick={() => {
-                    editCategory(work.id)
-                  }}
-                >
-                  Edit
-                </Button> */}
                   <Button
                     variant="danger"
                     onClick={() => deleteCategory(work.id)}
@@ -225,6 +193,6 @@ const OurWork = () => {
       </div>
     </div>
   );
-};
+}
 
-export default OurWork;
+export default Design;

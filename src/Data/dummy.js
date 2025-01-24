@@ -500,9 +500,14 @@ export const links = [
         icon: <TbPackages/>,
       },
       {
-        //name: 'Our-Work',
-       // icon: <MdWork/>,
-      },
+        name: 'Our-Work',
+        icon: <MdWork/>,
+      }
+      ,
+      {
+        name: 'design-drop',
+        icon: <MdWork/>,
+      }
     ],
   },
   {
