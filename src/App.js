@@ -34,6 +34,7 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     JSON.parse(localStorage.getItem('isAuthenticated')) || false
   );
+  const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || '');
 
   const {
     setCurrentColor,
@@ -54,49 +55,71 @@ const App = () => {
     }
   }, [setCurrentColor, setCurrentMode]);
 
-  // Handle logout by clearing authentication data
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('colorMode');
-    localStorage.removeItem('themeMode');
+    setUserRole('');
+    localStorage.clear();
   };
 
-  // Handle login by setting authentication data
-  const handleLogin = () => {
+  const handleLogin = (role) => {
     setIsAuthenticated(true);
+    setUserRole(role);
     localStorage.setItem('isAuthenticated', true);
+    localStorage.setItem('userRole', role);
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (sessionStorage.getItem('isTabClosed')) {
-        handleLogout();
-      }
-    };
-
-    // Set flag when the page is being closed
-    window.addEventListener('beforeunload', () => {
-      sessionStorage.setItem('isTabClosed', 'true');
-    });
-
-    if (!sessionStorage.getItem('isTabClosed')) {
-      sessionStorage.setItem('isTabClosed', 'false');
-    }
-
-    // Cleanup event listener
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      sessionStorage.removeItem('isTabClosed');
-    };
-  }, []);
-
-  // If the user is not authenticated, show the login form
   if (!isAuthenticated) {
     return <LoginForm onLogin={handleLogin} />;
   }
 
-  // Otherwise, show the main application dashboard
+  const roleBasedRoutes = () => {
+    switch (userRole) {
+      case 'CRM':
+        return (
+          <>
+            <Route path="/crm" element={<Crm />} />
+            <Route path="/Quotation" element={<Quotation />} />
+            <Route path="*" element={<Navigate to="/crm" />} />
+          </>
+        );
+      case 'TEAM':
+        return (
+          <>
+            <Route path="/orders" element={<Orders />} />
+            <Route path="*" element={<Navigate to="/orders" />} />
+          </>
+        );
+      case 'ADMIN':
+        return (
+          <>
+            <Route path="/revenue" element={<Ecommerce />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/digitalmarketing" element={<DigitalMarketing />} />
+            <Route path="/design" element={<Customers />} />
+            <Route path="/crm" element={<Crm />} />
+            <Route path="/Packages" element={<Packages />} />
+            <Route path="/Our-Work" element={<OurWork />} />
+            <Route path="/NewsLetter" element={<Newsletter />} />
+            <Route path="/Quotation" element={<Quotation />} />
+            <Route path="/kanban" element={<Kanban />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/color-picker" element={<ColorPicker />} />
+            <Route path="/line" element={<Line />} />
+            <Route path="/area" element={<Area />} />
+            <Route path="/bar" element={<Bar />} />
+            <Route path="/pie" element={<Pie />} />
+            <Route path="/financial" element={<Financial />} />
+            <Route path="/color-mapping" element={<ColorMapping />} />
+            <Route path="/pyramid" element={<Pyramid />} />
+            <Route path="/stacked" element={<Stacked />} />
+            <Route path="*" element={<Navigate to="/revenue" />} />
+          </>
+        );
+      default:
+        return <Route path="*" element={<Navigate to="/revenue" />} />;
+    }
+  };
+
   return (
     <div className={currentMode === 'Dark' ? 'dark' : ''}>
       <div className="flex relative dark:bg-main-dark-bg">
@@ -133,34 +156,7 @@ const App = () => {
           </div>
           <div>
             {themeSettings && <ThemeSettings />}
-            <Routes>
-              {/* Default route to Ecommerce (revenue) page */}
-              <Route path="/revenue" element={<Ecommerce />} />
-              {/* pages */}
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/digitalmarketing" element={<DigitalMarketing />} />
-              <Route path="/design" element={<Customers />} />
-              <Route path="/crm" element={<Crm />} />
-              <Route path="/Packages" element={<Packages />} />
-              <Route path="/Our-Work" element={<OurWork />} />
-              <Route path="/NewsLetter" element={<Newsletter />} />
-              <Route path="/Quotation" element={<Quotation />} />
-              {/* apps */}
-              <Route path="/kanban" element={<Kanban />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/color-picker" element={<ColorPicker />} />
-              {/* charts */}
-              <Route path="/line" element={<Line />} />
-              <Route path="/area" element={<Area />} />
-              <Route path="/bar" element={<Bar />} />
-              <Route path="/pie" element={<Pie />} />
-              <Route path="/financial" element={<Financial />} />
-              <Route path="/color-mapping" element={<ColorMapping />} />
-              <Route path="/pyramid" element={<Pyramid />} />
-              <Route path="/stacked" element={<Stacked />} />
-              {/* Redirect to revenue if no matching route */}
-              <Route path="*" element={<Navigate to="/revenue" />} />
-            </Routes>
+            <Routes>{roleBasedRoutes()}</Routes>
           </div>
           <Footer />
         </div>
@@ -183,24 +179,25 @@ const LoginForm = ({ onLogin }) => {
           { password }
         );
         if (response.data) {
-          onLogin(); // Call onLogin when successful login
+          const { role } = response.data;
+          onLogin(role);
         }
       } catch (err) {
-        if (err.response) {
-          setError(err.response.data.error); // Show error message from backend
-        } else {
-          setError('An unexpected error occurred');
-        }
+        setError(
+          err.response?.data?.error || 'An unexpected error occurred'
+        );
       }
     } else {
-      alert('Please enter both userId and password');
+      setError('Please enter both User ID and Password');
     }
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96 max-w-xs">
-        <h2 className="text-3xl font-semibold text-center text-gray-700 mb-4">Artisticify Dashboard</h2>
+        <h2 className="text-3xl font-semibold text-center text-gray-700 mb-4">
+          Artisticify Dashboard
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-600">User ID</label>
@@ -209,7 +206,7 @@ const LoginForm = ({ onLogin }) => {
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               className="w-full mt-2 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Enter your user ID"
+              placeholder="Enter your User ID"
             />
           </div>
           <div>
@@ -219,7 +216,7 @@ const LoginForm = ({ onLogin }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full mt-2 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Enter your password"
+              placeholder="Enter your Password"
             />
           </div>
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
