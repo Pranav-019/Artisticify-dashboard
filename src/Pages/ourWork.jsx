@@ -1,25 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { TextField, Button, MenuItem, Select, FormControl, InputLabel, Grid, Typography, CircularProgress } from '@mui/material';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Grid,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import styles for the carousel
 
 const OurWork = () => {
-  const [category, setCategory] = useState('');
-  const [subCategory, setSubCategory] = useState('');
-  const [imageUrls, setImageUrls] = useState('');
-  const [imageFile, setImageFile] = useState(null);
+  const [category, setCategory] = useState("");
+  const [subCategory, setSubCategory] = useState("");
+  const [imageFiles, setImageFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
   const [works, setWorks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingWorks, setLoadingWorks] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Fetch existing works from backend
+  // Fetch existing works from the backend
   const fetchWorks = async () => {
-    setLoading(true);
+    setLoadingWorks(true);
     try {
-      const response = await axios.get('https://artisticify-backend.vercel.app/api/ourwork/get');
-      setWorks(response.data.works);
+      const response = await axios.get(
+        "https://artisticify-backend.vercel.app/api/ourwork/fetch"
+      );
+      setWorks(response.data.data || []);
     } catch (error) {
-      console.error('Error fetching works:', error);
+      console.error("Error fetching works:", error);
     } finally {
-      setLoading(false);
+      setLoadingWorks(false);
     }
   };
 
@@ -29,46 +44,80 @@ const OurWork = () => {
 
   // Handle form submission
   const handleSubmit = async () => {
-    setLoading(true);
+    if (!category || imageFiles.length === 0) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    setSubmitting(true);
     try {
       const formData = new FormData();
-      formData.append('category', category);
-      formData.append('subCategory', subCategory);
-      formData.append('imageUrls', imageUrls.split(',').map(url => url.trim()));
-      
-      if (imageFile) {
-        formData.append('image', imageFile);
-      }
+      formData.append("category", category);
+      if (subCategory) formData.append("subCategory", subCategory);
 
-      const response = await axios.post('https://artisticify-backend.vercel.app/api/ourwork/insert', formData);
-  
-      alert(response.data.message);  // Show the response message
-  
-      // Optionally, update state with the new work
-      fetchWorks(); // Refresh works list if necessary
+      imageFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      const response = await axios.post(
+        "https://artisticify-backend.vercel.app/api/ourwork/insert",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      alert(response.data.message);
+      fetchWorks(); // Refresh the works list
     } catch (error) {
-      console.error('Error:', error);  // Log the error for debugging
-      alert('Error: ' + (error.response?.data?.message || 'Something went wrong'));
+      console.error("Error submitting work:", error);
+      alert("Submission failed. Please try again.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
+  // Handle image files change and preview generation
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setImageUrls(URL.createObjectURL(file)); // Preview the selected image
+    const files = e.target.files;
+    if (files) {
+      setImageFiles(Array.from(files));
+      const previews = Array.from(files).map((file) =>
+        URL.createObjectURL(file)
+      );
+      setPreviewUrls(previews);
+    }
+  };
+
+  // Cleanup URL objects on component unmount
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
+
+  // Handle delete request
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this work?")) {
+      try {
+        const response = await axios.delete(
+          `https://artisticify-backend.vercel.app/api/ourwork/delete/${id}`
+        );
+        alert(response.data.message);
+        fetchWorks(); // Refresh the works list after deletion
+      } catch (error) {
+        console.error("Error deleting work:", error);
+        alert("Error deleting work. Please try again.");
+      }
     }
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
         Our Work Gallery
       </Typography>
 
       <Grid container spacing={3}>
+        {/* Form Section */}
         <Grid item xs={12} md={6}>
           <Typography variant="h6">Add New Work</Typography>
           <FormControl fullWidth margin="normal">
@@ -76,14 +125,14 @@ const OurWork = () => {
             <Select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              label="category"
+              label="Category"
             >
               <MenuItem value="logo">logo</MenuItem>
               <MenuItem value="brochure">brochure</MenuItem>
               <MenuItem value="poster">poster</MenuItem>
               <MenuItem value="flyer">flyer</MenuItem>
               <MenuItem value="packaging">packaging</MenuItem>
-              <MenuItem value="ui/ux">ui/ux</MenuItem>
+              <MenuItem value="ui-ux">ui-ux</MenuItem>
               <MenuItem value="icon">icon</MenuItem>
               <MenuItem value="magazine">magazine</MenuItem>
               <MenuItem value="visual aid">visual Aid</MenuItem>
@@ -91,43 +140,43 @@ const OurWork = () => {
             </Select>
           </FormControl>
 
-          {category === 'stationary' && (
+          {category === "stationary" && (
             <FormControl fullWidth margin="normal">
               <InputLabel>SubCategory</InputLabel>
               <Select
                 value={subCategory}
                 onChange={(e) => setSubCategory(e.target.value)}
-                label="subCategory"
+                label="SubCategory"
               >
-                <MenuItem value="envelope">envelope</MenuItem>
-                <MenuItem value="menu-card">menu Card</MenuItem>
-                <MenuItem value="certificate">certificate</MenuItem>
+                <MenuItem value="envelope">Envelope</MenuItem>
+                <MenuItem value="menu-card">Menu Card</MenuItem>
+                <MenuItem value="certificate">Certificate</MenuItem>
               </Select>
             </FormControl>
           )}
 
-          <TextField
-            label="Image URLs (comma separated)"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={imageUrls}
-            onChange={(e) => setImageUrls(e.target.value)}
-          />
-
-          <div style={{ marginTop: '10px' }}>
+          <div style={{ marginTop: "10px" }}>
             <input
               type="file"
               accept="image/*"
+              multiple
               onChange={handleImageChange}
             />
-            {imageFile && (
-              <div style={{ marginTop: '10px' }}>
-                <img
-                  src={imageUrls}
-                  alt="preview"
-                  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                />
+            {previewUrls.length > 0 && (
+              <div style={{ marginTop: "10px" }}>
+                {previewUrls.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt="Preview"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      objectFit: "cover",
+                      marginRight: "10px",
+                    }}
+                  />
+                ))}
               </div>
             )}
           </div>
@@ -136,33 +185,65 @@ const OurWork = () => {
             variant="contained"
             color="primary"
             onClick={handleSubmit}
-            disabled={loading}
-            style={{ marginTop: '10px' }}
+            disabled={submitting}
+            style={{ marginTop: "10px" }}
           >
-            {loading ? <CircularProgress size={24} /> : 'Submit'}
+            {submitting ? <CircularProgress size={24} /> : "Submit"}
           </Button>
         </Grid>
 
+        {/* Gallery Section */}
         <Grid item xs={12} md={6}>
           <Typography variant="h6">Existing Works</Typography>
-          {loading ? (
+          {loadingWorks ? (
             <CircularProgress />
-          ) : (
+          ) : works.length > 0 ? (
             <Grid container spacing={2}>
               {works.map((work) => (
                 <Grid item xs={12} md={6} key={work._id}>
-                  <div style={{ padding: '10px', border: '1px solid #ddd' }}>
+                  <div style={{ padding: "10px", border: "1px solid #ddd" }}>
                     <Typography variant="h6">{work.category}</Typography>
-                    <Typography variant="body2">{work.subCategory || 'N/A'}</Typography>
-                    <div>
-                      {work.imageUrls.map((url, index) => (
-                        <img key={index} src={url} alt="work" style={{ width: '100%', marginTop: '10px' }} />
-                      ))}
-                    </div>
+                    <Typography variant="body2">
+                      {work.subCategory || "N/A"}
+                    </Typography>
+
+                    {/* Carousel for images */}
+                    <Carousel
+  showArrows={true}
+  infiniteLoop={true}
+  useKeyboardArrows={true}
+  dynamicHeight={true}
+  autoPlay={true} // Enable auto-play
+  interval={3000} // Set interval to 3 seconds (adjust as needed)
+>
+  {work.images.map((url, index) => (
+    <div key={index}>
+      <img
+        src={url}
+        alt={`work ${index}`}
+        style={{
+          width: "100%",
+          height: "auto",
+        }}
+      />
+    </div>
+  ))}
+</Carousel>
+
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleDelete(work._id)}
+                      style={{ marginTop: "10px" }}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </Grid>
               ))}
             </Grid>
+          ) : (
+            <Typography>No works available.</Typography>
           )}
         </Grid>
       </Grid>

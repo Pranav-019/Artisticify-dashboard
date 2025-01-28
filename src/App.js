@@ -29,6 +29,7 @@ import OurWork from './Pages/ourWork';
 import Newsletter from './Pages/newsLetter';
 import { useStateContext } from './Contexts/ContextProvider';
 import Quotation from './Pages/Quotation';
+import Design from './Pages/Design';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -95,10 +96,10 @@ const App = () => {
             <Route path="/revenue" element={<Ecommerce />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/digitalmarketing" element={<DigitalMarketing />} />
-            <Route path="/design" element={<Customers />} />
             <Route path="/crm" element={<Crm />} />
             <Route path="/Packages" element={<Packages />} />
             <Route path="/Our-Work" element={<OurWork />} />
+            <Route path="/design" element={<Design />} />
             <Route path="/NewsLetter" element={<Newsletter />} />
             <Route path="/Quotation" element={<Quotation />} />
             <Route path="/kanban" element={<Kanban />} />
