@@ -14,6 +14,7 @@ import "./css/orders.css";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { FaEye } from "react-icons/fa";
+import logoImage from '../Data/artisticify-logo.jpeg';
  // Import if you're using autoTable for tables
 
 
@@ -42,10 +43,40 @@ const Orders = () => {
 
   const generateInvoice = (order) => {
     const doc = new jsPDF();
+
+    // Get page dimensions and calculate center position
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Calculate logo dimensions
+    const imgProps = doc.getImageProperties(logoImage);
+    const logoWidth = 40;
+    const logoHeight = (imgProps.height * logoWidth) / imgProps.width;
+    
+    // Calculate X position to center the logo
+    const logoX = (pageWidth - logoWidth) / 2;
+    
+    // Add centered logo
+    doc.addImage(logoImage, 'PNG', logoX, 10, logoWidth, logoHeight);
+
+    // Add semi-transparent watermark
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const watermarkWidth = 150;
+    const watermarkHeight = (imgProps.height * watermarkWidth) / imgProps.width;
+    doc.setGState(new doc.GState({ opacity: 0.1 }));
+    doc.addImage(
+      logoImage,
+      'PNG',
+      (pageWidth - watermarkWidth) / 2,
+      (pageHeight - watermarkHeight) / 2,
+      watermarkWidth,
+      watermarkHeight
+    );
+    doc.setGState(new doc.GState({ opacity: 1 }));
+
   
     // Header Section
     doc.setFontSize(22);
-    doc.text("Artisticify", 105, 20, { align: "center" });
+    // doc.text("Artisticify", 105, 20, { align: "center" });
     doc.setFontSize(12);
     doc.text("3rd Floor, 307 Amanora Chamber, Amanora Mall Hadapsar, Pune", 105, 30, { align: "center" });
     doc.text("City - Pune, State Maharashtra, ZIP - 411028", 105, 35, { align: "center" });
@@ -76,7 +107,19 @@ const Orders = () => {
       head: [columns],
       body: rows,
       theme: "grid",
-      styles: { fontSize: 10 },
+      styles: { 
+        fontSize: 10,
+        lineColor: [0, 0, 255], // RGB value for blue
+        lineWidth: 0.5,
+      },
+      headStyles: {
+        fillColor: [255, 255, 255], // White background
+        textColor: [0, 0, 0], // Black text
+        lineColor: [0, 0, 0], // Blue border
+      },
+      bodyStyles: {
+        lineColor: [0, 0, 0] // Blue border
+      }
     });
   
     // Calculate remaining amount

@@ -132,7 +132,7 @@ const OurWork = () => {
               <MenuItem value="poster">poster</MenuItem>
               <MenuItem value="flyer">flyer</MenuItem>
               <MenuItem value="packaging">packaging</MenuItem>
-              <MenuItem value="ui-ux">ui-ux</MenuItem>
+              <MenuItem value="ui/ux">ui/ux</MenuItem>
               <MenuItem value="icon">icon</MenuItem>
               <MenuItem value="magazine">magazine</MenuItem>
               <MenuItem value="visual aid">visual Aid</MenuItem>
@@ -142,15 +142,15 @@ const OurWork = () => {
 
           {category === "stationary" && (
             <FormControl fullWidth margin="normal">
-              <InputLabel>SubCategory</InputLabel>
+              <InputLabel>subCategory</InputLabel>
               <Select
                 value={subCategory}
                 onChange={(e) => setSubCategory(e.target.value)}
                 label="SubCategory"
               >
-                <MenuItem value="envelope">Envelope</MenuItem>
-                <MenuItem value="menu-card">Menu Card</MenuItem>
-                <MenuItem value="certificate">Certificate</MenuItem>
+                <MenuItem value="envelope">envelope</MenuItem>
+                <MenuItem value="menu-card">menu card</MenuItem>
+                <MenuItem value="certificate">certificate</MenuItem>
               </Select>
             </FormControl>
           )}
