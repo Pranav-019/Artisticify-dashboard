@@ -81,8 +81,8 @@ const Navbar = ({ onLogout }) => {
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
 
   return (
-    <div className="flex justify-between items-center w-full px-4 py-2 relative bg-white dark:bg-secondary-dark-bg shadow-sm">
-      {/* Left side - Hamburger (only visible on mobile) */}
+    <div className="fixed top-0 right-0 left-0 z-50 flex justify-between items-center px-4 py-2 bg-white dark:bg-secondary-dark-bg shadow-md">
+      {/* Left side - Hamburger */}
       <div className="flex items-center">
         {isMobile && (
           <NavButton 
@@ -120,7 +120,7 @@ const Navbar = ({ onLogout }) => {
         {isClicked.userProfile && (
           <UserProfile 
             onLogout={onLogout} 
-            userRole={userRole} // Pass userRole directly
+            userRole={userRole}
           />
         )}
       </div>
