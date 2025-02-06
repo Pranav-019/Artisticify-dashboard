@@ -59,6 +59,8 @@ const App = () => {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUserRole('');
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userRole');
     localStorage.clear();
   };
 
