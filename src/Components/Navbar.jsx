@@ -7,6 +7,8 @@ import avatar from '../Data/avatar5.jpg';
 import { UserProfile } from '.';
 import { useStateContext } from '../Contexts/ContextProvider';
 
+
+// navbar 
 const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
   <TooltipComponent content={title} position="BottomCenter">
     <button
@@ -88,7 +90,7 @@ const Navbar = ({ onLogout }) => {
           <NavButton 
             title="Menu"
             customFunc={handleActiveMenu}
-            color={currentColor}
+            color={currentColor} 
             icon={<AiOutlineMenu />}
           />
         )}
