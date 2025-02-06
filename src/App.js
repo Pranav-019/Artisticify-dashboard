@@ -154,10 +154,10 @@ const App = () => {
               : 'bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2'
           }
         >
-          <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
+          <div className="sticky top-0 z-50">
             <Navbar onLogout={handleLogout} />
           </div>
-          <div>
+          <div className="mt-16">
             {themeSettings && <ThemeSettings />}
             <Routes>{roleBasedRoutes()}</Routes>
           </div>
