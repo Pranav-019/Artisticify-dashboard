@@ -9,6 +9,7 @@ import {
   DropdownButton,
   Form,
   Card,
+  ButtonGroup,
 } from "react-bootstrap";
 import { FaPen } from "react-icons/fa";
 import { Header } from "../Components";
@@ -187,66 +188,133 @@ const Crm = () => {
     }
   };
 
+  const renderMobileCard = (lead) => (
+    <div className="mobile-lead-card mb-3 p-3 bg-white rounded shadow-sm">
+      <div className="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 className="mb-1">{lead.name}</h6>
+          <p className="mb-1 text-muted small">{lead.phone}</p>
+        </div>
+        <Button
+          variant="link"
+          className="p-0"
+          onClick={() => handleTabToggle(lead)}
+        >
+          <FaPen size={20} />
+        </Button>
+      </div>
+      
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <span className={`status-badge ${lead.status?.toLowerCase().replace(' ', '-')}`}>
+          {lead.status}
+        </span>
+        <span className={`lead-type-badge ${lead.leadType?.toLowerCase().replace(' ', '-')}`}>
+          {lead.leadType}
+        </span>
+      </div>
+      
+      <div className="mobile-lead-details">
+        <p className="mb-1 small"><strong>Service:</strong> {lead.serviceSelected}</p>
+        <p className="mb-0 small"><strong>Email:</strong> {lead.email}</p>
+      </div>
+    </div>
+  );
+
   return (
-    <Container className="crm-container">
+    <Container fluid className="crm-container p-2 p-md-4">
       <Row>
         <Col>
           <Header category="Page" title="CRM" />
 
           <Card className="mb-4">
-            <Card.Body>
-              <div className="d-flex justify-content-between mb-3">
-                <div className="d-flex gap-3">
-                  <Button variant="primary" onClick={() => applyFilter("today")}>
+            <Card.Body className="p-2 p-md-4">
+              <div className="filter-section mb-4">
+                <ButtonGroup className="d-flex flex-wrap gap-2">
+                  <Button 
+                    variant="primary" 
+                    className="flex-grow-1 mb-2 mb-md-0"
+                    onClick={() => applyFilter("today")}
+                  >
                     Today
                   </Button>
-                  <Button variant="primary" onClick={() => applyFilter("thisWeek")}>
+                  <Button 
+                    variant="primary" 
+                    className="flex-grow-1 mb-2 mb-md-0"
+                    onClick={() => applyFilter("thisWeek")}
+                  >
                     This Week
                   </Button>
-                  <Button variant="primary" onClick={() => applyFilter("thisMonth")}>
+                  <Button 
+                    variant="primary" 
+                    className="flex-grow-1 mb-2 mb-md-0"
+                    onClick={() => applyFilter("thisMonth")}
+                  >
                     This Month
                   </Button>
-                  <Button variant="primary" onClick={() => applyFilter("all")}>
+                  <Button 
+                    variant="primary" 
+                    className="flex-grow-1 mb-2 mb-md-0"
+                    onClick={() => applyFilter("all")}
+                  >
                     All
                   </Button>
-                </div>
+                </ButtonGroup>
               </div>
 
-              <h5>Leads List</h5>
+              <h5 className="mb-3">Leads List</h5>
               {loading ? (
                 <p>Loading...</p>
               ) : (
-                <Table striped bordered hover responsive className="lead-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Phone</th>
-                      <th>Service</th>
-                      <th>Status</th>
-                      <th>Lead Type</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredLeads.map((lead) => (
-                      <tr key={lead._id}>
-                        <td>{lead.name}</td>
-                        <td>{lead.email}</td>
-                        <td>{lead.phone}</td>
-                        <td>{lead.serviceSelected}</td>
-                        <td>{lead.status}</td>
-                        <td>{lead.leadType}</td>
-                        <td>
-                          <FaPen
-                            size={24}
-                            onClick={() => handleTabToggle(lead)}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                <>
+                  <div className="d-block d-md-none">
+                    {filteredLeads.map((lead) => renderMobileCard(lead))}
+                  </div>
+
+                  <div className="d-none d-md-block table-responsive">
+                    <Table striped bordered hover className="lead-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Phone</th>
+                          <th>Service</th>
+                          <th>Status</th>
+                          <th>Lead Type</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredLeads.map((lead) => (
+                          <tr key={lead._id}>
+                            <td>{lead.name}</td>
+                            <td>{lead.email}</td>
+                            <td>{lead.phone}</td>
+                            <td>{lead.serviceSelected}</td>
+                            <td>
+                              <span className={`status-badge ${lead.status?.toLowerCase().replace(' ', '-')}`}>
+                                {lead.status}
+                              </span>
+                            </td>
+                            <td>
+                              <span className={`lead-type-badge ${lead.leadType?.toLowerCase().replace(' ', '-')}`}>
+                                {lead.leadType}
+                              </span>
+                            </td>
+                            <td>
+                              <Button
+                                variant="link"
+                                className="p-0"
+                                onClick={() => handleTabToggle(lead)}
+                              >
+                                <FaPen size={20} />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </>
               )}
             </Card.Body>
           </Card>
@@ -254,100 +322,123 @@ const Crm = () => {
           {showTab && selectedLead && (
             <div className="lead-tab">
               <Card className="mb-4">
-                <Card.Body>
-                  <h4>Lead Details</h4>
-                  <p><strong>Name:</strong> {selectedLead.name}</p>
-                  <p><strong>Email:</strong> {selectedLead.email}</p>
-                  <p><strong>Phone:</strong> {selectedLead.phone}</p>
-                  <p><strong>Service:</strong> {selectedLead.serviceSelected}</p>
-                  <p><strong>Status:</strong>
-                    <DropdownButton
-                      id="status-dropdown"
-                      title={selectedLead.status || "Select"}
-                      onSelect={(value) => {
-                        updateLeadField(selectedLead._id, "status", value);
-                      }}
+                <Card.Body className="p-3 p-md-4">
+                  <div className="d-flex justify-content-between align-items-center flex-wrap mb-4">
+                    <h4 className="mb-3 mb-md-0">Lead Details</h4>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setShowTab(false)}
+                      className="mb-3 mb-md-0"
                     >
-                      <Dropdown.Item eventKey="New">New</Dropdown.Item>
-                      <Dropdown.Item eventKey="In Progress">In Progress</Dropdown.Item>
-                      <Dropdown.Item eventKey="Converted">Converted</Dropdown.Item>
-                      <Dropdown.Item eventKey="Non Converted">Non Converted</Dropdown.Item>
-                    </DropdownButton>
-                  </p>
-                  <p><strong>Lead Type:</strong>
-                    <DropdownButton
-                      id="leadType-dropdown"
-                      title={selectedLead.leadType || "Select"}
-                      onSelect={(value) => {
-                        updateLeadField(selectedLead._id, "leadType", value);
-                      }}
-                    >
-                      <Dropdown.Item eventKey="High Priority">High Priority</Dropdown.Item>
-                      <Dropdown.Item eventKey="Medium Priority">Medium Priority</Dropdown.Item>
-                      <Dropdown.Item eventKey="Low Priority">Low Priority</Dropdown.Item>
-                    </DropdownButton>
-                  </p>
-                  <p><strong>Follow Up:</strong></p>
-                  <div className="follow-up-section">
-                    {selectedLead.followUp?.map((comment, index) => (
-                      <div key={index} className="follow-up-comment">
-                        {index + 1}. {comment}
-                      </div>
-                    ))}
+                      Close Tab
+                    </Button>
                   </div>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    value={followUpComment}
-                    onChange={(e) => setFollowUpComment(e.target.value)}
-                    placeholder="Add new follow-up comment..."
-                    className="mt-2"
-                  />
-                  <Button
-                    variant="primary"
-                    onClick={handleFollowUpChange}
-                    disabled={!followUpComment}
-                    className="mt-2"
-                  >
-                    Add Follow Up
-                  </Button>
-                  {updateSuccess && (
-                    <p className="text-success mt-2">
-                      Follow-up comment added successfully!
-                    </p>
-                  )}
-                  <Button
-                    variant="secondary"
-                    onClick={() => setShowTab(false)}
-                    className="ms-2 mt-2"
-                  >
-                    Close Tab
-                  </Button>
+
+                  <div className="lead-details-grid">
+                    <div className="detail-item">
+                      <strong>Name:</strong>
+                      <p>{selectedLead.name}</p>
+                    </div>
+                    <div className="detail-item">
+                      <strong>Email:</strong>
+                      <p>{selectedLead.email}</p>
+                    </div>
+                    <div className="detail-item">
+                      <strong>Phone:</strong>
+                      <p>{selectedLead.phone}</p>
+                    </div>
+                    <div className="detail-item">
+                      <strong>Service:</strong>
+                      <p>{selectedLead.serviceSelected}</p>
+                    </div>
+
+                    <div className="detail-item">
+                      <strong>Status:</strong>
+                      <DropdownButton
+                        id="status-dropdown"
+                        title={selectedLead.status || "Select"}
+                        className="mt-2"
+                        onSelect={(value) => updateLeadField(selectedLead._id, "status", value)}
+                      >
+                        <Dropdown.Item eventKey="New">New</Dropdown.Item>
+                        <Dropdown.Item eventKey="In Progress">In Progress</Dropdown.Item>
+                        <Dropdown.Item eventKey="Converted">Converted</Dropdown.Item>
+                        <Dropdown.Item eventKey="Non Converted">Non Converted</Dropdown.Item>
+                      </DropdownButton>
+                    </div>
+
+                    <div className="detail-item">
+                      <strong>Lead Type:</strong>
+                      <DropdownButton
+                        id="leadType-dropdown"
+                        title={selectedLead.leadType || "Select"}
+                        className="mt-2"
+                        onSelect={(value) => updateLeadField(selectedLead._id, "leadType", value)}
+                      >
+                        <Dropdown.Item eventKey="High Priority">High Priority</Dropdown.Item>
+                        <Dropdown.Item eventKey="Medium Priority">Medium Priority</Dropdown.Item>
+                        <Dropdown.Item eventKey="Low Priority">Low Priority</Dropdown.Item>
+                      </DropdownButton>
+                    </div>
+                  </div>
+
+                  <div className="follow-up-section mt-4">
+                    <h5>Follow Up Comments</h5>
+                    <div className="follow-up-comments mb-3">
+                      {selectedLead.followUp?.map((comment, index) => (
+                        <div key={index} className="follow-up-comment p-2 mb-2 bg-light rounded">
+                          {index + 1}. {comment}
+                        </div>
+                      ))}
+                    </div>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      value={followUpComment}
+                      onChange={(e) => setFollowUpComment(e.target.value)}
+                      placeholder="Add new follow-up comment..."
+                      className="mb-2"
+                    />
+                    <Button
+                      variant="primary"
+                      onClick={handleFollowUpChange}
+                      disabled={!followUpComment}
+                    >
+                      Add Follow Up
+                    </Button>
+                    {updateSuccess && (
+                      <p className="text-success mt-2">
+                        Follow-up comment added successfully!
+                      </p>
+                    )}
+                  </div>
 
                   <div className="meeting-section mt-4">
                     <h5>Start Online Meeting</h5>
-                    <Form.Group>
-                      <Form.Label>Meeting Room Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter meeting room name"
-                        value={meetingRoom}
-                        onChange={(e) => setMeetingRoom(e.target.value)}
-                      />
-                    </Form.Group>
-                    <Form.Group className="mt-2">
-                      <Form.Label>Your Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter your name"
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                      />
-                    </Form.Group>
+                    <div className="meeting-form-grid">
+                      <Form.Group>
+                        <Form.Label>Meeting Room Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter meeting room name"
+                          value={meetingRoom}
+                          onChange={(e) => setMeetingRoom(e.target.value)}
+                        />
+                      </Form.Group>
+                      <Form.Group>
+                        <Form.Label>Your Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter your name"
+                          value={userName}
+                          onChange={(e) => setUserName(e.target.value)}
+                        />
+                      </Form.Group>
+                    </div>
                     <Button
                       variant="success"
                       onClick={handleStartMeeting}
-                      className="mt-2"
+                      className="mt-3"
                     >
                       Start Meeting
                     </Button>
