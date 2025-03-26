@@ -30,6 +30,7 @@ import Newsletter from './Pages/newsLetter';
 import { useStateContext } from './Contexts/ContextProvider';
 import Quotation from './Pages/Quotation';
 import Design from './Pages/Design';
+import Socialmedialinks from './Pages/Socialmedialinks';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -103,6 +104,7 @@ const App = () => {
             <Route path="/Our-Work" element={<OurWork />} />
             <Route path="/design" element={<Design />} />
             <Route path="/NewsLetter" element={<Newsletter />} />
+            <Route path="/Social-Links" element={<Socialmedialinks />} />
             <Route path="/Quotation" element={<Quotation />} />
             <Route path="/kanban" element={<Kanban />} />
             <Route path="/calendar" element={<Calendar />} />

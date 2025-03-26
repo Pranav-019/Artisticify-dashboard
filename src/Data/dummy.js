@@ -533,6 +533,11 @@ export const links = [
         name: 'NewsLetter',
         icon: <GiNewspaper />,
       },
+
+      {
+        name: 'Social-Links',
+        icon: <GiNewspaper />,
+      },
     ],
   },
   
