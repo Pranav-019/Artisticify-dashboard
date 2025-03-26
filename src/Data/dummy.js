@@ -19,6 +19,7 @@ import { RiCustomerService2Line } from "react-icons/ri";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { FaFileInvoice } from "react-icons/fa6";
 import { FaImages } from "react-icons/fa6";
+import { TiSocialAtCircular } from "react-icons/ti";
 
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';
@@ -536,7 +537,7 @@ export const links = [
 
       {
         name: 'Social-Links',
-        icon: <GiNewspaper />,
+        icon: <TiSocialAtCircular />,
       },
     ],
   },
