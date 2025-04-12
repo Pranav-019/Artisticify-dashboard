@@ -216,7 +216,7 @@ const LoginForm = ({ onLogin }) => {
     if (userId && password) {
       try {
         const response = await axios.post(
-          `https://artisticify-backend.vercel.app/api/users/getUser/${userId}`,
+         `https://artisticify-backend.vercel.app/api/users/getUser/${userId}`,
           { password }
         );
         if (response.data) {
