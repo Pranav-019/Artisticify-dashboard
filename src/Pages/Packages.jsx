@@ -124,7 +124,6 @@ const Packages = () => {
         <Table striped bordered hover responsive>
           <thead>
             <tr>
-              <th>Package ID</th>
               <th>Name</th>
               <th>Type</th>
               <th>Category</th>
@@ -138,7 +137,6 @@ const Packages = () => {
           <tbody>
             {packages.map((pkg) => (
               <tr key={pkg._id}>
-                <td>{pkg._id}</td>
                 {editingRow === pkg._id ? (
                   <>
                     <td>

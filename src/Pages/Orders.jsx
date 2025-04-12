@@ -7,15 +7,17 @@ import {
   Table,
   Card,
   Form,
+  ButtonGroup,
 } from "react-bootstrap";
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaFileDownload } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/orders.css";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { FaEye } from "react-icons/fa";
- // Import if you're using autoTable for tables
-
+import logoImage from '../Data/artisticify-logo.jpeg';
+import { Header } from '../Components';
+import axios from 'axios';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -27,6 +29,7 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [showTab, setShowTab] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [editingOrder, setEditingOrder] = useState(null);
 
   // New order form state
   const [newOrder, setNewOrder] = useState({
@@ -42,10 +45,39 @@ const Orders = () => {
 
   const generateInvoice = (order) => {
     const doc = new jsPDF();
+
+    // Get page dimensions and calculate center position
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Calculate logo dimensions
+    const imgProps = doc.getImageProperties(logoImage);
+    const logoWidth = 40;
+    const logoHeight = (imgProps.height * logoWidth) / imgProps.width;
+    
+    // Calculate X position to center the logo
+    const logoX = (pageWidth - logoWidth) / 2;
+    
+    // Add centered logo
+    doc.addImage(logoImage, 'PNG', logoX, 10, logoWidth, logoHeight);
+
+    // Add semi-transparent watermark
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const watermarkWidth = 150;
+    const watermarkHeight = (imgProps.height * watermarkWidth) / imgProps.width;
+    doc.setGState(new doc.GState({ opacity: 0.1 }));
+    doc.addImage(
+      logoImage,
+      'PNG',
+      (pageWidth - watermarkWidth) / 2,
+      (pageHeight - watermarkHeight) / 2,
+      watermarkWidth,
+      watermarkHeight
+    );
+    doc.setGState(new doc.GState({ opacity: 1 }));
   
     // Header Section
     doc.setFontSize(22);
-    doc.text("Artisticify", 105, 20, { align: "center" });
+    // doc.text("Artisticify", 105, 20, { align: "center" });
     doc.setFontSize(12);
     doc.text("3rd Floor, 307 Amanora Chamber, Amanora Mall Hadapsar, Pune", 105, 30, { align: "center" });
     doc.text("City - Pune, State Maharashtra, ZIP - 411028", 105, 35, { align: "center" });
@@ -76,7 +108,19 @@ const Orders = () => {
       head: [columns],
       body: rows,
       theme: "grid",
-      styles: { fontSize: 10 },
+      styles: { 
+        fontSize: 10,
+        lineColor: [0, 0, 255], // RGB value for blue
+        lineWidth: 0.5,
+      },
+      headStyles: {
+        fillColor: [255, 255, 255], // White background
+        textColor: [0, 0, 0], // Black text
+        lineColor: [0, 0, 0], // Blue border
+      },
+      bodyStyles: {
+        lineColor: [0, 0, 0] // Blue border
+      }
     });
   
     // Calculate remaining amount
@@ -94,6 +138,7 @@ const Orders = () => {
     doc.setFontSize(10);
     doc.text("This is a system-generated invoice.", 14, 280);
     doc.text("For any queries, contact us at info@artisticify.com.", 14, 285);
+    doc.text("For Refund policies, refer to our website {link: 'www.artisticify.com'}", 14, 290, );
   
     // Save the PDF
     doc.save(`Invoice-${order.orderId}.pdf`);
@@ -104,11 +149,10 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("https://artisticify-backend.vercel.app/api/orders");
-        if (!response.ok) throw new Error("Failed to fetch orders");
-        const data = await response.json();
-        setOrders(data);
-        setFilteredOrders(data);
+        setLoading(true);
+        const response = await axios.get("https://artisticify-backend.vercel.app/api/orders");
+        setOrders(response.data);
+        setFilteredOrders(response.data);
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {
@@ -170,12 +214,10 @@ const Orders = () => {
   // Update order status or add updates
   const updateOrderField = async (orderId, field, value) => {
     try {
-      const response = await fetch(`https://artisticify-backend.vercel.app/api/orders/${orderId}`, {
-        method: "PUT",
+      const response = await axios.put(`https://artisticify-backend.vercel.app/api/orders/${orderId}`, { [field]: value }, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ [field]: value }),
       });
 
       if (!response.ok) {
@@ -207,12 +249,10 @@ const Orders = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://artisticify-backend.vercel.app/api/orders", {
-        method: "POST",
+      const response = await axios.post("https://artisticify-backend.vercel.app/api/orders", newOrder, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newOrder),
       });
 
       if (!response.ok) {
@@ -240,44 +280,277 @@ const Orders = () => {
   };
 
   // Handle editing an order
-  const handleEditOrder = async (e) => {
-    e.preventDefault();
+  const handleEdit = (order) => {
+    setEditingOrder(order);
+  };
 
+  const handleEditSubmit = async () => {
     try {
-      const response = await fetch(`https://artisticify-backend.vercel.app/api/orders/${selectedOrder._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(selectedOrder),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update order");
-      }
-
-      const updatedOrder = await response.json();
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === selectedOrder._id ? updatedOrder : order
-        )
+      console.log('Updating order status:', editingOrder.status);
+      const response = await axios.put(
+        `https://artisticify-backend.vercel.app/api/orders/${editingOrder._id}`,
+        { orderStatus: editingOrder.status }
       );
-      setUpdateSuccess(true);
+      
+      if (response.status === 200) {
+        console.log('Order status updated successfully');
+        setOrders(orders.map(order => 
+          order._id === editingOrder._id ? { ...order, status: editingOrder.status } : order
+        ));
+        setFilteredOrders(filteredOrders.map(order => 
+          order._id === editingOrder._id ? { ...order, status: editingOrder.status } : order
+        ));
+        setUpdateSuccess(true);
+        setTimeout(() => {
+          setUpdateSuccess(false);
+          setEditingOrder(null);
+        }, 2000);
+      }
     } catch (error) {
-      console.error("Error updating order:", error);
+      console.error('Error updating order status:', error);
     }
   };
 
-  // Handle viewing order details
-  const handleViewDetails = (order) => {
-    handleTabToggle(order, "details");
+  const handleEditChange = (value) => {
+    setEditingOrder(prev => ({
+      ...prev,
+      status: value
+    }));
   };
 
+  const handleGenerate = (orderId) => {
+    console.log('Generate invoice for order:', orderId);
+  };
+
+  const renderMobileCard = (order) => (
+    <div className="mobile-order-card mb-3 p-3 bg-white rounded shadow-sm" key={order._id}>
+      <div className="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 className="mb-1">{order.customerName}</h6>
+          <p className="mb-1 text-muted small">{order.phone}</p>
+        </div>
+        <span className={`order-status-badge ${order.orderStatus?.toLowerCase().replace(' ', '-')}`}>
+          {order.orderStatus}
+        </span>
+      </div>
+      
+      <div className="mobile-order-details">
+        <p className="mb-1 small"><strong>Service:</strong> {order.serviceSelected}</p>
+        <p className="mb-1 small"><strong>Email:</strong> {order.customerEmail}</p>
+        <p className="mb-1 small"><strong>Amount:</strong> ₹{order.amountPaid}</p>
+        <p className="mb-0 small"><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
+      </div>
+      <div className="d-flex gap-2 justify-content-end mt-2">
+        <Button
+          variant="link"
+          className="p-0 text-primary"
+          onClick={() => handleEdit(order)}
+        >
+          <FaPen size={16} />
+        </Button>
+        <Button
+          variant="link"
+          className="p-0 text-success"
+          onClick={() => handleGenerate(order._id)}
+        >
+          <FaFileDownload size={16} />
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
-    <Container className="orders-container">
+    <Container fluid className="orders-container p-2 p-md-4">
       <Row>
         <Col>
-          <h1>Orders</h1>
+          <Header category="Page" title="Orders" />
+
+          {updateSuccess && (
+            <div className="alert alert-success" role="alert">
+              Status updated successfully!
+            </div>
+          )}
+
+          <Card className="mb-4">
+            <Card.Body className="p-2 p-md-4">
+              {/* Filter Buttons Section */}
+              <div className="filter-section mb-4">
+                <ButtonGroup className="d-flex flex-wrap gap-2">
+                  <Button 
+                    variant="primary" 
+                    className="flex-grow-1 mb-2 mb-md-0"
+                    onClick={() => applyFilter("today")}
+                  >
+                    Today
+                  </Button>
+                  <Button 
+                    variant="primary" 
+                    className="flex-grow-1 mb-2 mb-md-0"
+                    onClick={() => applyFilter("thisWeek")}
+                  >
+                    This Week
+                  </Button>
+                  <Button 
+                    variant="primary" 
+                    className="flex-grow-1 mb-2 mb-md-0"
+                    onClick={() => applyFilter("thisMonth")}
+                  >
+                    This Month
+                  </Button>
+                  <Button 
+                    variant="primary" 
+                    className="flex-grow-1 mb-2 mb-md-0"
+                    onClick={() => applyFilter("all")}
+                  >
+                    All
+                  </Button>
+                </ButtonGroup>
+              </div>
+
+              <h5 className="mb-3">Orders List</h5>
+              {loading ? (
+                <p>Loading...</p>
+              ) : (
+                <>
+                  {/* Mobile View */}
+                  <div className="d-block d-md-none">
+                    {filteredOrders.map((order) => renderMobileCard(order))}
+                  </div>
+
+                  {/* Desktop View */}
+                  <div className="d-none d-md-block table-responsive">
+                    <Table striped bordered hover className="orders-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th className="d-none d-md-table-cell">Email</th>
+                          <th>Phone</th>
+                          <th className="d-none d-md-table-cell">Service</th>
+                          <th>Amount</th>
+                          <th>Status</th>
+                          <th className="d-none d-md-table-cell">Date</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredOrders.map((order) => (
+                          <tr key={order._id}>
+                            {editingOrder && editingOrder._id === order._id ? (
+                              // Edit mode
+                              <>
+                                <td>
+                                  <Form.Control
+                                    type="text"
+                                    value={editingOrder.name}
+                                    onChange={(e) => handleEditChange('name', e.target.value)}
+                                  />
+                                </td>
+                                <td className="d-none d-md-table-cell">
+                                  <Form.Control
+                                    type="email"
+                                    value={editingOrder.email}
+                                    onChange={(e) => handleEditChange('email', e.target.value)}
+                                  />
+                                </td>
+                                <td>
+                                  <Form.Control
+                                    type="text"
+                                    value={editingOrder.phone}
+                                    onChange={(e) => handleEditChange('phone', e.target.value)}
+                                  />
+                                </td>
+                                <td className="d-none d-md-table-cell">
+                                  <Form.Control
+                                    type="text"
+                                    value={editingOrder.service}
+                                    onChange={(e) => handleEditChange('service', e.target.value)}
+                                  />
+                                </td>
+                                <td>
+                                  <Form.Control
+                                    type="number"
+                                    value={editingOrder.amount}
+                                    onChange={(e) => handleEditChange('amount', e.target.value)}
+                                  />
+                                </td>
+                                <td>
+                                  <Form.Select
+                                    value={editingOrder.status}
+                                    onChange={(e) => handleEditChange(e.target.value)}
+                                    className="status-select"
+                                  >
+                                    <option value="Pending">Pending</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                  </Form.Select>
+                                </td>
+                                <td className="d-none d-md-table-cell">
+                                  {new Date(order.createdAt).toLocaleDateString()}
+                                </td>
+                                <td>
+                                  <div className="d-flex gap-2 justify-content-center">
+                                    <Button
+                                      variant="success"
+                                      size="sm"
+                                      onClick={handleEditSubmit}
+                                    >
+                                      Save
+                                    </Button>
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      onClick={() => setEditingOrder(null)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </div>
+                                </td>
+                              </>
+                            ) : (
+                              // View mode
+                              <>
+                                <td>{order.customerName}</td>
+                                <td className="d-none d-md-table-cell">{order.customerEmail}</td>
+                                <td>{order.phone}</td>
+                                <td className="d-none d-md-table-cell">{order.serviceSelected}</td>
+                                <td>₹{order.amountPaid}</td>
+                                <td>
+                                  <span className={`order-status-badge ${order.orderStatus?.toLowerCase().replace(' ', '-')}`}>
+                                    {order.orderStatus}
+                                  </span>
+                                </td>
+                                <td className="d-none d-md-table-cell">
+                                  {new Date(order.createdAt).toLocaleDateString()}
+                                </td>
+                                <td>
+                                  <div className="d-flex gap-2 justify-content-center">
+                                    <Button
+                                      variant="link"
+                                      className="p-0 text-primary"
+                                      onClick={() => handleEdit(order)}
+                                    >
+                                      <FaPen size={16} />
+                                    </Button>
+                                    <Button
+                                      variant="link"
+                                      className="p-0 text-success"
+                                      onClick={() => handleGenerate(order._id)}
+                                    >
+                                      <FaFileDownload size={16} />
+                                    </Button>
+                                  </div>
+                                </td>
+                              </>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </>
+              )}
+            </Card.Body>
+          </Card>
 
           {/* Create Order Form */}
           <Card className="mb-4">
@@ -382,66 +655,6 @@ const Orders = () => {
             </Card.Body>
           </Card>
 
-          {/* Filter Buttons */}
-          <Card className="mb-4">
-            <Card.Body>
-              <div className="d-flex gap-3 mb-3">
-                <Button onClick={() => applyFilter("today")}>Today</Button>
-                <Button onClick={() => applyFilter("thisWeek")}>This Week</Button>
-                <Button onClick={() => applyFilter("thisMonth")}>This Month</Button>
-                <Button onClick={() => applyFilter("all")}>All</Button>
-              </div>
-
-              {loading ? (
-                <p>Loading...</p>
-              ) : (
-                <Table striped bordered hover responsive>
-                  <thead>
-                    <tr>
-                      <th>Order ID</th>
-                      <th>Customer</th>
-                      <th>Service</th>
-                      <th>Status</th>
-                      <th>Details</th>
-                      <th>Action</th>
-                      <th>Invoice</th>
-
-                    </tr>
-                  </thead>
-                  <tbody>
-  {filteredOrders.map((order) => (
-    <tr key={order.orderId}>
-      <td>{order.orderId}</td>
-      <td>{order.customerName}</td>
-      <td>{order.serviceSelected}</td>
-      <td>{order.orderStatus}</td>
-      <td>
-        <FaEye
-          onClick={() => handleViewDetails(order)}
-          style={{ cursor: "pointer", color: "blue" }}
-        />
-      </td>
-      <td>
-        <FaPen onClick={() => handleTabToggle(order, "edit")} />
-      </td>
-      <td>
-        <Button
-          variant="success"
-          onClick={() => generateInvoice(order)}
-        >
-          Generate Invoice
-        </Button>
-      </td>
-    </tr>
-  ))}
-</tbody>
-
-
-                </Table>
-              )}
-            </Card.Body>
-          </Card>
-
           {showTab.details && selectedOrder && (
             <Card className="mb-4">
               <Card.Body>
@@ -456,7 +669,7 @@ const Orders = () => {
             <Card className="mb-4">
               <Card.Body>
                 <h4>Edit Order</h4>
-                <Form onSubmit={handleEditOrder}>
+                <Form onSubmit={handleEditSubmit}>
                 <Form.Group controlId="orderStatus">
                      <Form.Label>Status</Form.Label>
                      <Form.Control

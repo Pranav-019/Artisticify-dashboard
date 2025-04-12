@@ -1,198 +1,146 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Button, Container, Image, Table } from "react-bootstrap";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Button, Card, Form, Container, Row, Col, Alert, Spinner, Carousel } from 'react-bootstrap';
 
-function Design() {
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [ourWorks, setOurWorks] = useState([]);
-  const [editingCategoryId, setEditingCategoryId] = useState(null);
+const Design = () => {
+  const [category, setCategory] = useState('');
+  const [images, setImages] = useState([]);
+  const [designs, setDesigns] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false); // Added loading state
 
-  const fetchOurWorks = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5000/api/design/fetch"
-      );
-
-      console.log("Response for fetch : ", response);
-      if (response.data.success) {
-        setOurWorks(response.data.ourDesign);
-      } else {
-        console.error("Failed to fetch Our Work items:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching Our Work items:", error);
-    }
-  };
-
+  // Fetch designs on load
   useEffect(() => {
-    fetchOurWorks();
+    setLoading(true); // Start loading
+    axios.get('https://artisticify-backend.vercel.app/api/design/get')
+      .then((response) => {
+        setDesigns(response.data);
+        setLoading(false); // Stop loading once data is fetched
+      })
+      .catch((err) => {
+        setError('Failed to fetch designs.');
+        setLoading(false);
+      });
   }, []);
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+  const handleImageChange = (e) => {
+    setSelectedFiles(e.target.files);
   };
 
-  const addImage = async () => {
-    if (!selectedCategory || !selectedFile) {
-      alert("Please select a category and an image.");
-      return;
-    }
-
+  const handleAddDesign = async () => {
     const formData = new FormData();
-    formData.append("category", selectedCategory);
-    formData.append("imageUrls", selectedFile);
+    formData.append('category', category);
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append('images', selectedFiles[i]);
+    }
 
+    setLoading(true); // Start loading when submitting
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/design/insert",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response.data.success) {
-        alert("Image added successfully!");
-      } else {
-        alert("Failed to add image.");
-      }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Error occurred while adding the image.");
+      const response = await axios.post('https://artisticify-backend.vercel.app/api/design/insert', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setMessage('Design added successfully!');
+      setCategory('');
+      setSelectedFiles([]);
+      setDesigns((prevDesigns) => [...prevDesigns, response.data.design]);
+      setLoading(false); // Stop loading
+    } catch (err) {
+      setError('Failed to add design.');
+      setLoading(false);
     }
   };
 
-  const deleteCategory = async (id) => {
+  const handleDeleteDesign = async (id) => {
+    setLoading(true); // Start loading while deleting
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/design/delete/${id}`
-      );
-      console.log("Response for Delete : ", response);
-      if (response.data.success) {
-        alert("Category and Image deleted successfully!");
-        fetchOurWorks();
-      } else {
-        alert("Failed to delete category.");
-      }
-    } catch (error) {
-      console.error("Error deleting category:", error);
-      alert("Error occurred while deleting the category.");
+      await axios.delete(`https://artisticify-backend.vercel.app/api/design/delete/${id}`);
+      setMessage('Design deleted successfully!');
+      setDesigns(designs.filter((design) => design._id !== id));
+      setLoading(false); // Stop loading
+    } catch (err) {
+      setError('Failed to delete design.');
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10">
-      <div className="max-w-7xl mx-auto px-6">
-        <h1
-          className="text-4xl font-bold text-center text-blue-600 mb-8"
-          style={{ color: "#03c9d7" }}
-        >
-          Design
-        </h1>
+    <Container>
+      <h2 className="my-4">Design Management</h2>
 
-        <div className="bg-white p-6 rounded-lg shadow-md mb-10">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            Add Image
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-gray-600 font-medium">
-                Select Category:
-              </label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                <option value="">-- Select --</option>
-                <option value="logo-design">logo-design</option>
-                <option value="brochure-design">brochure-design</option>
-                <option value="flyer-design">flyer-design</option>
-                <option value="packaging-design">packaging-design</option>
-                <option value="icon-design">icon-design</option>
-                <option value="uiux-design">uiux-design</option>
-                <option value="stationary-design">stationary-design</option>
-                <option value="magazine-design">magazine-design</option>
-                <option value="visualAid-design">visualAid-design</option>
-                <option value="poster-design">poster-design</option>
+      {/* Alert Messages */}
+      {message && <Alert variant="success">{message}</Alert>}
+      {error && <Alert variant="danger">{error}</Alert>}
 
-                <option value="calendar-design">calendar-design</option>
-                <option value="letterHead-design">letterHead-design</option>
-                <option value="envelope-design">envelope-design</option>
-                <option value="visitingCard-design">visitingCard-design</option>
-                <option value="certificate-design">certificate-design</option>
-                <option value="menuCard-design">menuCard-design</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-600 font-medium">
-                Select Image(s):
-              </label>
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            <button
-              onClick={addImage}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700"
-            >
-              Add Image
-            </button>
-          </div>
+      {/* Loader */}
+      {loading && (
+        <div className="text-center my-4">
+          <Spinner animation="border" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
         </div>
+      )}
 
-        <Container>
-          <div className="container py-4">
-            {ourWorks.map((work) => (
-              <div
-                className="row align-items-center border-bottom py-3"
-                key={work.id}
-              >
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mb-md-0">
-                  <h6 className="fw-bold">{work.category}</h6>
-                </div>
+      {/* Form to Add Design */}
+      <Row className="mb-4">
+        <Col md={6}>
+          <Form>
+            <Form.Group>
+              <Form.Label>Category</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Images</Form.Label>
+              <Form.Control
+                type="file"
+                multiple
+                onChange={handleImageChange}
+              />
+            </Form.Group>
+            <Button variant="primary" onClick={handleAddDesign}>Add Design</Button>
+          </Form>
+        </Col>
+      </Row>
 
-                <div className="col-lg-4 col-md-5 col-sm-12 mb-2 mb-md-0">
-                  <div className="d-flex flex-wrap gap-2">
-                    {work.images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={`data:${image.contentType};base64,${image.data}`}
-                        alt={`${work.category} ${index}`}
-                        className="rounded object-cover"
-                        style={{
-                          width: "70px",
-                          height: "70px",
-                          border: "1px solid #ccc",
-                        }}
-                      />
+      {/* Display All Designs */}
+      <Row>
+        {designs.map((design) => (
+          <Col md={4} key={design._id} className="mb-4">
+            <Card>
+              {/* Carousel for multiple images */}
+              <Card.Body>
+                <Card.Title>{design.category}</Card.Title>
+                {design.images.length > 1 ? (
+                  <Carousel>
+                    {design.images.map((image, index) => (
+                      <Carousel.Item key={index}>
+                        <img className="d-block w-100" src={image} alt={`design-image-${index}`} />
+                      </Carousel.Item>
                     ))}
-                  </div>
-                </div>
-
-                {/* Delete Button */}
-                <div className="col-lg-5 col-md-3 col-sm-12 d-flex justify-content-start justify-content-md-end gap-2">
-                  <Button
-                    variant="danger"
-                    onClick={() => deleteCategory(work.id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </div>
-    </div>
+                  </Carousel>
+                ) : (
+                  <Card.Img variant="top" src={design.images[0]} />
+                )}
+                <Button
+                  variant="danger"
+                  onClick={() => handleDeleteDesign(design._id)}
+                  className="mt-3"
+                >
+                  Delete
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Container>
   );
-}
+};
 
 export default Design;

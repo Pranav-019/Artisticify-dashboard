@@ -6,6 +6,8 @@ import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 import { Pie, Bar, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement } from 'chart.js';
 import { Button, LineChart, SparkLine } from '../Components';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { useStateContext } from '../Contexts/ContextProvider';
 
 // Register Chart.js components
@@ -18,7 +20,7 @@ const dropdownData = [
 ];
 
 const DropDown = ({ currentMode }) => (
-  <div className="w-28 border-1 border-color px-2 py-1 rounded-md">
+  <div className="dropdown-container">
     <DropDownListComponent
       id="time"
       fields={{ text: 'Time', value: 'Id' }}
@@ -149,41 +151,86 @@ const Ecommerce = () => {
   };
 
   return (
-    <div className="mt-24">
+    <Container fluid className="mt-4">
       {loading ? (
-        <p>Loading...</p>
+        <div className="text-center">
+          <p>Loading...</p>
+        </div>
       ) : (
         <>
-          <div className="flex flex-wrap lg:flex-nowrap justify-center">
-            <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg h-44 rounded-xl w-full lg:w-80 p-8 pt-9 m-3 bg-hero-pattern bg-no-repeat bg-cover bg-center">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-gray-400">Earnings</p>
-                  <p className="text-2xl">
-                    <BsCurrencyRupee /> {calculateTotalRevenue()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Row className="mb-4">
+            <Col xs={12} sm={6} lg={3}>
+              <Card className="h-100 shadow-sm">
+                <Card.Body>
+                  <Card.Title className="text-muted h6">Earnings</Card.Title>
+                  <div className="d-flex align-items-center">
+                    <BsCurrencyRupee className="fs-5" />
+                    <span className="h4 mb-0 ms-2">{calculateTotalRevenue()}</span>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
 
-          <div className="flex gap-10 flex-wrap justify-center">
-            <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg m-3 p-6 rounded-2xl w-full md:w-780">
-              {/* Reduced the size of the pie chart by adjusting its container width */}
-              <div style={{ width: '300px', height: '300px' }}>
-                <Pie data={pieChartData} />
-              </div>
-            </div>
-            <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg m-3 p-6 rounded-2xl w-full md:w-780">
-              <Bar data={groupedBarData} options={groupedBarOptions} />
-            </div>
-            <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg m-3 p-6 rounded-2xl w-full md:w-780">
-              <Line data={multiLineData} options={multiLineOptions} />
-            </div>
-          </div>
+          <Row>
+            <Col xs={12} lg={4} className="mb-4">
+              <Card className="h-100 shadow-sm">
+                <Card.Body>
+                  <Card.Title className="text-center mb-4">Revenue Distribution</Card.Title>
+                  <div style={{ height: '300px' }}>
+                    <Pie 
+                      data={pieChartData}
+                      options={{
+                        maintainAspectRatio: false,
+                        responsive: true
+                      }}
+                    />
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            <Col xs={12} className="mb-4">
+              <Card className="shadow-sm">
+                <Card.Body>
+                  <Card.Title className="text-center mb-4">Payment Trends</Card.Title>
+                  <div style={{ height: '300px' }}>
+                    <Line 
+                      data={multiLineData} 
+                      options={{
+                        ...multiLineOptions,
+                        maintainAspectRatio: false,
+                        responsive: true
+                      }}
+                    />
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col xs={12} className="mb-4">
+              <Card className="shadow-sm">
+                <Card.Body>
+                  <Card.Title className="text-center mb-4">Service-wise Revenue</Card.Title>
+                  <div style={{ height: '300px' }}>
+                    <Bar 
+                      data={groupedBarData} 
+                      options={{
+                        ...groupedBarOptions,
+                        maintainAspectRatio: false,
+                        responsive: true
+                      }}
+                    />
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
         </>
       )}
-    </div>
+    </Container>
   );
 };
 
