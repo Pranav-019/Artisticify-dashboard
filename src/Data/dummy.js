@@ -17,6 +17,7 @@ import { TbPackages } from "react-icons/tb";
 import { MdWork } from "react-icons/md";
 import { RiCustomerService2Line } from "react-icons/ri";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
+import { FaFileInvoice } from "react-icons/fa6";
 
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';
@@ -507,7 +508,15 @@ export const links = [
       {
         name: 'design-drop',
         icon: <MdWork/>,
-      }
+      
+        //name: 'Our-Work',
+       // icon: <MdWork/>,
+      },
+
+      {
+        name: 'Quotation',
+       icon: <FaFileInvoice />,
+      },
     ],
   },
   {

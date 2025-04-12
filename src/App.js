@@ -29,6 +29,7 @@ import OurWork from './Pages/ourWork';
 import Newsletter from './Pages/newsLetter';
 import { useStateContext } from './Contexts/ContextProvider';
 import Design from './Pages/Design';
+import Quotation from './Pages/Quotation';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -145,6 +146,7 @@ const App = () => {
               <Route path="/Our-Work" element={<OurWork />} />
               <Route path="/design-drop" element={<Design/>} />
               <Route path="/NewsLetter" element={<Newsletter />} />
+              <Route path="/Quotation" element={<Quotation />} />
               {/* apps */}
               <Route path="/kanban" element={<Kanban />} />
               <Route path="/calendar" element={<Calendar />} />

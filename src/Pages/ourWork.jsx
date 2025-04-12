@@ -1,228 +1,171 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Button, Container, Image, Table } from "react-bootstrap";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { TextField, Button, MenuItem, Select, FormControl, InputLabel, Grid, Typography, CircularProgress } from '@mui/material';
 
 const OurWork = () => {
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [ourWorks, setOurWorks] = useState([]);
-  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [category, setCategory] = useState('');
+  const [subCategory, setSubCategory] = useState('');
+  const [imageUrls, setImageUrls] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [works, setWorks] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const fetchOurWorks = async () => {
+  // Fetch existing works from backend
+  const fetchWorks = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/ourwork/fetch"
-      );
-      if (response.data.success) {
-        setOurWorks(response.data.ourWorks);
-      } else {
-        console.error("Failed to fetch Our Work items:", response.data.message);
-      }
+      const response = await axios.get('https://artisticify-backend.vercel.app/api/ourwork/get');
+      setWorks(response.data.works);
     } catch (error) {
-      console.error("Error fetching Our Work items:", error);
+      console.error('Error fetching works:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOurWorks();
+    fetchWorks();
   }, []);
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
-
-  const addImage = async () => {
-    if (!selectedCategory || !selectedFile) {
-      alert("Please select a category and an image.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("category", selectedCategory);
-    formData.append("imageUrls", selectedFile); // "imageUrls" matches the key in your backend
-
+  // Handle form submission
+  const handleSubmit = async () => {
+    setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/ourwork/insert",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response.data.success) {
-        alert("Image added successfully!");
-      } else {
-        alert("Failed to add image.");
+      const formData = new FormData();
+      formData.append('category', category);
+      formData.append('subCategory', subCategory);
+      formData.append('imageUrls', imageUrls.split(',').map(url => url.trim()));
+      
+      if (imageFile) {
+        formData.append('image', imageFile);
       }
+
+      const response = await axios.post('https://artisticify-backend.vercel.app/api/ourwork/insert', formData);
+  
+      alert(response.data.message);  // Show the response message
+  
+      // Optionally, update state with the new work
+      fetchWorks(); // Refresh works list if necessary
     } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Error occurred while adding the image.");
+      console.error('Error:', error);  // Log the error for debugging
+      alert('Error: ' + (error.response?.data?.message || 'Something went wrong'));
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deleteCategory = async (id) => {
-    try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/ourwork/delete/${id}`
-      );
-      console.log("Response for Delete : ", response);
-      if (response.data.success) {
-        alert("Category deleted successfully!");
-        fetchOurWorks();
-      } else {
-        alert("Failed to delete category.");
-      }
-    } catch (error) {
-      console.error("Error deleting category:", error);
-      alert("Error occurred while deleting the category.");
-    }
-  };
-
-  const editCategory = async (id) => {
-    if (!selectedCategory) {
-      alert("Please enter a category name to update.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("category", selectedCategory);
-    if (selectedFile) {
-      formData.append("imageUrls", selectedFile);
-    }
-
-    try {
-      const response = await axios.put(
-        `http://localhost:5000/api/ourwork/update/${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response.data.success) {
-        alert("Category updated successfully!");
-        fetchOurWorks();
-        setEditingCategoryId(null);
-        setSelectedCategory("");
-        setSelectedFile(null);
-      } else {
-        alert("Failed to update category.");
-      }
-    } catch (error) {
-      console.error("Error updating category:", error);
-      alert("Error occurred while updating the category.");
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageUrls(URL.createObjectURL(file)); // Preview the selected image
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10">
-      <div className="max-w-7xl mx-auto px-6">
-        <h1
-          className="text-4xl font-bold text-center text-blue-600 mb-8"
-          style={{ color: "#03c9d7" }}
-        >
-          Our Work
-        </h1>
+    <div style={{ padding: '20px' }}>
+      <Typography variant="h4" gutterBottom>
+        Our Work Gallery
+      </Typography>
 
-        <div className="bg-white p-6 rounded-lg shadow-md mb-10">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            Add Image
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-gray-600 font-medium">
-                Select Category:
-              </label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                <option value="">-- Select --</option>
-                <option value="logo">logo</option>
-                <option value="brochure">brochure</option>
-                <option value="poster">poster</option>
-                <option value="flyer">flyer</option>
-                <option value="packaging">packaging</option>
-                <option value="ui/ux">ui/ux</option>
-                <option value="icon">icon</option>
-                <option value="magazine">magazine</option>
-                <option value="visual Aid">visual Aid</option>
-                <option value="stationary">stationary</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-600 font-medium">
-                Select Image(s):
-              </label>
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            <button
-              onClick={addImage}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700"
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Typography variant="h6">Add New Work</Typography>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              label="category"
             >
-              Add Image
-            </button>
-          </div>
-        </div>
+              <MenuItem value="logo">logo</MenuItem>
+              <MenuItem value="brochure">brochure</MenuItem>
+              <MenuItem value="poster">poster</MenuItem>
+              <MenuItem value="flyer">flyer</MenuItem>
+              <MenuItem value="packaging">packaging</MenuItem>
+              <MenuItem value="ui/ux">ui/ux</MenuItem>
+              <MenuItem value="icon">icon</MenuItem>
+              <MenuItem value="magazine">magazine</MenuItem>
+              <MenuItem value="visual aid">visual Aid</MenuItem>
+              <MenuItem value="stationary">stationary</MenuItem>
+            </Select>
+          </FormControl>
 
-        <Container>
-          <div className="container py-4">
-            {ourWorks.map((work) => (
-              <div
-                className="row align-items-center border-bottom py-3"
-                key={work.id}
+          {category === 'stationary' && (
+            <FormControl fullWidth margin="normal">
+              <InputLabel>SubCategory</InputLabel>
+              <Select
+                value={subCategory}
+                onChange={(e) => setSubCategory(e.target.value)}
+                label="subCategory"
               >
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mb-md-0">
-                  <h6 className="fw-bold">{work.category}</h6>
-                </div>
+                <MenuItem value="envelope">envelope</MenuItem>
+                <MenuItem value="menu-card">menu Card</MenuItem>
+                <MenuItem value="certificate">certificate</MenuItem>
+              </Select>
+            </FormControl>
+          )}
 
-                <div className="col-lg-4 col-md-5 col-sm-12 mb-2 mb-md-0">
-                  <div className="d-flex flex-wrap gap-2">
-                    {work.images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={`data:${image.contentType};base64,${image.data}`}
-                        alt={`${work.category} ${index}`}
-                        className="rounded object-cover"
-                        style={{ width: "70px", height: "70px" }}
-                      />
-                    ))}
-                  </div>
-                </div>
+          <TextField
+            label="Image URLs (comma separated)"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={imageUrls}
+            onChange={(e) => setImageUrls(e.target.value)}
+          />
 
-                <div className="col-lg-5 col-md-3 col-sm-12 d-flex justify-content-start justify-content-md-end gap-2">
-                  {/* <Button
-                  // variant=""
-                  className="me-2 bg-blue-600"
-                  onClick={() => {
-                    editCategory(work.id)
-                  }}
-                >
-                  Edit
-                </Button> */}
-                  <Button
-                    variant="danger"
-                    onClick={() => deleteCategory(work.id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
+          <div style={{ marginTop: '10px' }}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            {imageFile && (
+              <div style={{ marginTop: '10px' }}>
+                <img
+                  src={imageUrls}
+                  alt="preview"
+                  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                />
               </div>
-            ))}
+            )}
           </div>
-        </Container>
-      </div>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={loading}
+            style={{ marginTop: '10px' }}
+          >
+            {loading ? <CircularProgress size={24} /> : 'Submit'}
+          </Button>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Typography variant="h6">Existing Works</Typography>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <Grid container spacing={2}>
+              {works.map((work) => (
+                <Grid item xs={12} md={6} key={work._id}>
+                  <div style={{ padding: '10px', border: '1px solid #ddd' }}>
+                    <Typography variant="h6">{work.category}</Typography>
+                    <Typography variant="body2">{work.subCategory || 'N/A'}</Typography>
+                    <div>
+                      {work.imageUrls.map((url, index) => (
+                        <img key={index} src={url} alt="work" style={{ width: '100%', marginTop: '10px' }} />
+                      ))}
+                    </div>
+                  </div>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </Grid>
+      </Grid>
     </div>
   );
 };
