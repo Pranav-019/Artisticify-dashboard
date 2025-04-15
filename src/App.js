@@ -31,6 +31,7 @@ import { useStateContext } from './Contexts/ContextProvider';
 import Quotation from './Pages/Quotation';
 import Design from './Pages/Design';
 import Socialmedialinks from './Pages/Socialmedialinks';
+import Counter from './Pages/Counter';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -106,6 +107,8 @@ const App = () => {
             <Route path="/NewsLetter" element={<Newsletter />} />
             <Route path="/Social-Links" element={<Socialmedialinks />} />
             <Route path="/Quotation" element={<Quotation />} />
+            <Route path="/Counter" element={<Counter/>} />
+
             <Route path="/kanban" element={<Kanban />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/color-picker" element={<ColorPicker />} />

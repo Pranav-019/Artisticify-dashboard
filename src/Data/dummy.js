@@ -20,7 +20,7 @@ import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { FaFileInvoice } from "react-icons/fa6";
 import { FaImages } from "react-icons/fa6";
 import { TiSocialAtCircular } from "react-icons/ti";
-
+import { PiClockCounterClockwiseBold } from "react-icons/pi";
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';
 import avatar3 from './avatar3.png';
@@ -33,6 +33,7 @@ import product5 from './product5.jpg';
 import product6 from './product6.jpg';
 import product7 from './product7.jpg';
 import product8 from './product8.jpg';
+import Counter from '../Pages/Counter';
 
 export const gridOrderImage = (props) => (
   <div>
@@ -506,6 +507,10 @@ export const links = [
         name: 'Our-Work',
        icon: <MdWork/>,
       },
+      {
+        name: 'Counter',
+       icon: <PiClockCounterClockwiseBold />,
+      },
 
       {
         name: 'Design',
@@ -514,6 +519,10 @@ export const links = [
 
       {
         name: 'Quotation',
+       icon: <FaFileInvoice />,
+      },
+      {
+        name: 'Testimonial',
        icon: <FaFileInvoice />,
       },
     ],
