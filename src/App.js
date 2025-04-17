@@ -31,6 +31,8 @@ import { useStateContext } from './Contexts/ContextProvider';
 import Quotation from './Pages/Quotation';
 import Design from './Pages/Design';
 import Socialmedialinks from './Pages/Socialmedialinks';
+import Blog from './Pages/Blog';
+import Testimonial from './Pages/Testimonial';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -106,6 +108,8 @@ const App = () => {
             <Route path="/NewsLetter" element={<Newsletter />} />
             <Route path="/Social-Links" element={<Socialmedialinks />} />
             <Route path="/Quotation" element={<Quotation />} />
+            <Route path="/Blog" element={<Blog />} />
+            <Route path="/Testimonial" element={<Testimonial />} />
             <Route path="/kanban" element={<Kanban />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/color-picker" element={<ColorPicker />} />

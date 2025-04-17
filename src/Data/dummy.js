@@ -20,6 +20,7 @@ import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { FaFileInvoice } from "react-icons/fa6";
 import { FaImages } from "react-icons/fa6";
 import { TiSocialAtCircular } from "react-icons/ti";
+import { FaBlogger,FaUserCircle } from "react-icons/fa";
 
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';
@@ -516,6 +517,14 @@ export const links = [
         name: 'Quotation',
        icon: <FaFileInvoice />,
       },
+      {
+        name: 'Blog',
+       icon: <FaBlogger />,
+      },
+      {
+        name: 'Testimonial',
+       icon: <FaUserCircle />,
+      }
     ],
   },
   {
