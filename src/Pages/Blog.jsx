@@ -72,18 +72,31 @@ const Blog = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const data = new FormData();
-        data.append('mainTitle', formData.mainTitle);
-        data.append('shortDescription', formData.shortDescription);
-        data.append('description', formData.description);
-        data.append('sections', JSON.stringify(formData.sections));
-        if (formData.image) data.append('image', formData.image);
 
+        // Creating the data object instead of FormData
+        const data = {
+            mainTitle: formData.mainTitle,
+            shortDescription: formData.shortDescription,
+            description: formData.description,
+            sections: formData.sections,
+        };
+
+        console.log("data : ", data);
         try {
             if (editMode) {
-                await axios.put(`https://artisticify-backend.vercel.app/api/blogs/updateBlog/${editingBlogId}`, data);
+                // PUT request to update the blog
+                await axios.put(`https://artisticify-backend.vercel.app/api/blogs/updateBlog/${editingBlogId}`, data, {
+                    headers: {
+                        'Content-Type': 'application/json', // Ensure the backend knows it's JSON
+                    },
+                });
             } else {
-                await axios.post('https://artisticify-backend.vercel.app/api/blogs/addBlog', data);
+                // POST request to add the blog
+                await axios.post('https://artisticify-backend.vercel.app/api/blogs/addBlog', data, {
+                    headers: {
+                        'Content-Type': 'application/json', // Ensure the backend knows it's JSON
+                    },
+                });
             }
             fetchBlogs();
             resetForm();
