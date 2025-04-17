@@ -33,6 +33,7 @@ import Design from './Pages/Design';
 import Socialmedialinks from './Pages/Socialmedialinks';
 import Blog from './Pages/Blog';
 import Testimonial from './Pages/Testimonial';
+import Counter from './Pages/Counter';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -110,6 +111,8 @@ const App = () => {
             <Route path="/Quotation" element={<Quotation />} />
             <Route path="/Blog" element={<Blog />} />
             <Route path="/Testimonial" element={<Testimonial />} />
+            <Route path="/Counter" element={<Counter/>} />
+
             <Route path="/kanban" element={<Kanban />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/color-picker" element={<ColorPicker />} />
