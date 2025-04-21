@@ -32,15 +32,10 @@ const Blog = () => {
     fetchBlogs();
   }, []);
 
-  const handleChange = (e, index = null, field = null) => {
+  const handleChange = (e) => {
     const { name, value, files } = e.target;
-
     if (name === "image") {
       setFormData((prev) => ({ ...prev, image: files[0] }));
-    } else if (field !== null && index !== null) {
-      const updatedSections = [...formData.sections];
-      updatedSections[index][field] = value;
-      setFormData((prev) => ({ ...prev, sections: updatedSections }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -94,7 +89,7 @@ const Blog = () => {
           data,
           {
             headers: {
-              "Content-Type": "application/json", // Ensure the backend knows it's JSON
+              "Content-Type": "application/json",
             },
           }
         );
@@ -105,7 +100,7 @@ const Blog = () => {
           data,
           {
             headers: {
-              "Content-Type": "application/json", // Ensure the backend knows it's JSON
+              "Content-Type": "application/json",
             },
           }
         );

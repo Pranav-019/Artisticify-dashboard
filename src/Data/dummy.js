@@ -571,6 +571,14 @@ export const links = [
         name: "Testimonial",
         icon: <FaUserCircle />,
       },
+      {
+        name: "CardCarousel",
+        icon: <FaUserCircle />,
+      },
+      {
+        name: "ReverseCardCarousel",
+        icon: <FaUserCircle />,
+      },
     ],
   },
   {

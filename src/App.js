@@ -34,6 +34,8 @@ import Socialmedialinks from './Pages/Socialmedialinks';
 import Blog from './Pages/Blog';
 import Testimonial from './Pages/Testimonial';
 import Counter from './Pages/Counter';
+import CardCarousel from './Pages/CardCarousel';
+import ReverseCardCarousel from './Pages/ReverseCardCarousel';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -112,6 +114,8 @@ const App = () => {
             <Route path="/Blog" element={<Blog />} />
             <Route path="/Testimonial" element={<Testimonial />} />
             <Route path="/Counter" element={<Counter/>} />
+            <Route path="/CardCarousel" element={<CardCarousel/>} />
+            <Route path="/ReverseCardCarousel" element={<ReverseCardCarousel/>} />
 
             <Route path="/kanban" element={<Kanban />} />
             <Route path="/calendar" element={<Calendar />} />
@@ -181,7 +185,7 @@ const App = () => {
               <Route path="/design-drop" element={<Design/>} />
               <Route path="/NewsLetter" element={<Newsletter />} />
               <Route path="/Quotation" element={<Quotation />} />
-              <Route path="/Blog" element={<Blog />} />
+              {/* <Route path="/Blog" element={<Blog />} /> */}
               <Route path="/Testimonial" element={<Testimonial />} />
               <Route path="/Counter" element={<Counter />} />
               {/* apps */}
