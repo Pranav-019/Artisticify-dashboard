@@ -109,7 +109,7 @@ const App = () => {
             <Route path="/NewsLetter" element={<Newsletter />} />
             <Route path="/Social-Links" element={<Socialmedialinks />} />
             <Route path="/Quotation" element={<Quotation />} />
-            {/* <Route path="/Blog" element={<Blog />} /> */}
+            <Route path="/Blog" element={<Blog />} />
             <Route path="/Testimonial" element={<Testimonial />} />
             <Route path="/Counter" element={<Counter/>} />
 
@@ -124,11 +124,11 @@ const App = () => {
             <Route path="/color-mapping" element={<ColorMapping />} />
             <Route path="/pyramid" element={<Pyramid />} />
             <Route path="/stacked" element={<Stacked />} />
-            <Route path="*" element={<Navigate to="/revenue" />} />
+            {/* <Route path="*" element={<Navigate to="/revenue" />} /> */}
           </>
         );
       default:
-        return <Route path="*" element={<Navigate to="/revenue" />} />;
+        // return <Route path="*" element={<Navigate to="/revenue" />} />;
     }
   };
 
@@ -181,6 +181,7 @@ const App = () => {
               <Route path="/design-drop" element={<Design/>} />
               <Route path="/NewsLetter" element={<Newsletter />} />
               <Route path="/Quotation" element={<Quotation />} />
+
               {/* apps */}
               <Route path="/kanban" element={<Kanban />} />
               <Route path="/calendar" element={<Calendar />} />
@@ -195,7 +196,7 @@ const App = () => {
               <Route path="/pyramid" element={<Pyramid />} />
               <Route path="/stacked" element={<Stacked />} />
               {/* Redirect to revenue if no matching route */}
-              <Route path="*" element={<Navigate to="/revenue" />} />
+              {/* <Route path="*" element={<Navigate to="/revenue" />} /> */}
             </Routes>
             <Routes>{roleBasedRoutes()}</Routes>
           </div>
