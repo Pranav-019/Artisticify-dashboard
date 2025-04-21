@@ -185,11 +185,8 @@ const App = () => {
               <Route path="/design-drop" element={<Design/>} />
               <Route path="/NewsLetter" element={<Newsletter />} />
               <Route path="/Quotation" element={<Quotation />} />
-<<<<<<< HEAD
 
-=======
               {/* <Route path="/Blog" element={<Blog />} /> */}
->>>>>>> b8669d78f57e749da8dca7ba751dfe8aae052d62
               <Route path="/Testimonial" element={<Testimonial />} />
               <Route path="/Counter" element={<Counter />} />
               {/* apps */}
