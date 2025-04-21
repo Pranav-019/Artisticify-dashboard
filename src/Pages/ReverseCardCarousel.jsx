@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Form, Button, Table, Modal, Alert } from 'react-bootstrap';
+import { Form, Button, Table, Modal } from 'react-bootstrap';
 
 const ReverseCardCarousel = () => {
-    const [cards, setCards] = useState([]);  // Ensure cards is an empty array by default
+    const [cards, setCards] = useState([]);
     const [formData, setFormData] = useState({
         image: null,
     });
@@ -11,17 +12,12 @@ const ReverseCardCarousel = () => {
     const [editMode, setEditMode] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
 
     // Fetch cards from the backend
     const fetchCards = async () => {
         try {
             const res = await axios.get('https://artisticify-backend.vercel.app/api/reverseCara/fetchReverseCard');
-            if (res.data && Array.isArray(res.data.cards)) {
-                setCards(res.data.cards);
-            } else {
-                console.error('Invalid data format:', res.data);
-            }
+            setCards(res.data.images);
         } catch (error) {
             console.error('Error fetching cards:', error);
         }
@@ -45,17 +41,10 @@ const ReverseCardCarousel = () => {
         setEditMode(false);
         setEditingId(null);
         setShowModal(false);
-        setErrorMessage('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!formData.image) {
-            setErrorMessage('Please upload an image.');
-            return;
-        }
-
         const data = new FormData();
         if (formData.image) {
             data.append('image', formData.image);
@@ -109,21 +98,15 @@ const ReverseCardCarousel = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {cards.length === 0 ? (
-                        <tr>
-                            <td colSpan="2" style={{ textAlign: 'center' }}>No cards available</td>
+                    {cards.map((card) => (
+                        <tr key={card._id}>
+                            <td><img src={card.image} alt="Card" width="100" /></td>
+                            <td>
+                                <Button variant="warning" size="sm" onClick={() => handleEdit(card)}>Edit</Button>{' '}
+                                <Button variant="danger" size="sm" onClick={() => handleDelete(card._id)}>Delete</Button>
+                            </td>
                         </tr>
-                    ) : (
-                        cards.map((card) => (
-                            <tr key={card._id}>
-                                <td><img src={card.image} alt="Card" width="100" /></td>
-                                <td>
-                                    <Button variant="warning" size="sm" onClick={() => handleEdit(card)}>Edit</Button>{' '}
-                                    <Button variant="danger" size="sm" onClick={() => handleDelete(card._id)}>Delete</Button>
-                                </td>
-                            </tr>
-                        ))
-                    )}
+                    ))}
                 </tbody>
             </Table>
 
@@ -133,9 +116,6 @@ const ReverseCardCarousel = () => {
                     <Modal.Title>{editMode ? 'Update Card' : 'Add New Card'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {/* Display error message if no image is selected */}
-                    {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Image</Form.Label>
