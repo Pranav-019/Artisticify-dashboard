@@ -32,15 +32,10 @@ const Blog = () => {
     fetchBlogs();
   }, []);
 
-  const handleChange = (e, index = null, field = null) => {
+  const handleChange = (e) => {
     const { name, value, files } = e.target;
-
     if (name === "image") {
       setFormData((prev) => ({ ...prev, image: files[0] }));
-    } else if (field !== null && index !== null) {
-      const updatedSections = [...formData.sections];
-      updatedSections[index][field] = value;
-      setFormData((prev) => ({ ...prev, sections: updatedSections }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -88,12 +83,30 @@ const Blog = () => {
       if (editMode) {
         await axios.put(
           `https://artisticify-backend.vercel.app/api/blogs/updateBlog/${editingBlogId}`,
+<<<<<<< HEAD
           formDataToSend
+=======
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+>>>>>>> b8669d78f57e749da8dca7ba751dfe8aae052d62
         );
       } else {
         await axios.post(
           "https://artisticify-backend.vercel.app/api/blogs/addBlog",
+<<<<<<< HEAD
           formDataToSend
+=======
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+>>>>>>> b8669d78f57e749da8dca7ba751dfe8aae052d62
         );
       }
       fetchBlogs();
