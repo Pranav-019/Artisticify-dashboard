@@ -36,6 +36,7 @@ import Testimonial from './Pages/Testimonial';
 import Counter from './Pages/Counter';
 import CardCarousel from './Pages/CardCarousel';
 import ReverseCardCarousel from './Pages/ReverseCardCarousel';
+import CollectionDashboard from './Pages/Collection';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -116,6 +117,7 @@ const App = () => {
             <Route path="/Counter" element={<Counter/>} />
             <Route path="/CardCarousel" element={<CardCarousel/>} />
             <Route path="/ReverseCardCarousel" element={<ReverseCardCarousel/>} />
+            <Route path="/Collection" element={<CollectionDashboard/>} />
 
             <Route path="/kanban" element={<Kanban />} />
             <Route path="/calendar" element={<Calendar />} />
