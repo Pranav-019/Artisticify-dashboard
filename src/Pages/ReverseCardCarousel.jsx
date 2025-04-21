@@ -84,7 +84,7 @@ const ReverseCardCarousel = () => {
     return (
         <div className="container mt-5">
             <h2 style={{ textAlign: 'center', color: '#333', fontSize: '26px', fontWeight: 'bold', marginTop: '20px' }}>
-                Card Carousel Dashboard
+                Reverse Card Carousel Dashboard
             </h2>
             <Button className="my-3" onClick={() => { resetForm(); setShowModal(true); }}>
                 Add Card
