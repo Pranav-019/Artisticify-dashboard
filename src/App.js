@@ -182,6 +182,9 @@ const App = () => {
               <Route path="/NewsLetter" element={<Newsletter />} />
               <Route path="/Quotation" element={<Quotation />} />
 
+              <Route path="/Blog" element={<Blog />} />
+              <Route path="/Testimonial" element={<Testimonial />} />
+              <Route path="/Counter" element={<Counter />} />
               {/* apps */}
               <Route path="/kanban" element={<Kanban />} />
               <Route path="/calendar" element={<Calendar />} />
@@ -221,7 +224,7 @@ const LoginForm = ({ onLogin }) => {
     if (userId && password) {
       try {
         const response = await axios.post(
-          `https://artisticify-backend.vercel.app/api/users/getUser/${userId}`,
+         `https://artisticify-backend.vercel.app/api/users/getUser/${userId}`,
           { password }
         );
         if (response.data) {

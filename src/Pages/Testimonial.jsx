@@ -18,8 +18,9 @@ const Testimonial = () => {
 
     const fetchTestimonials = async () => {
         try {
-            const res = await axios.get('https://artisticify-backend.vercel.app/api/testimonials');
-            setTestimonials(res.data);
+            const res = await axios.get('https://artisticify-backend.vercel.app/api/testimonials/fetchTestimonial');
+            console.log("response : ", res)
+            setTestimonials(res.data.testimonials);
         } catch (error) {
             console.error('Error fetching testimonials:', error);
         }
@@ -64,9 +65,9 @@ const Testimonial = () => {
 
         try {
             if (editMode) {
-                await axios.put(`https://artisticify-backend.vercel.app/api/testimonials/${editingId}`, data);
+                await axios.put(`https://artisticify-backend.vercel.app/api/testimonials/updateTestimonial/${editingId}`, data);
             } else {
-                await axios.post('https://artisticify-backend.vercel.app/api/testimonials', data);
+                await axios.post('https://artisticify-backend.vercel.app/api/testimonials/addTestimonial', data);
             }
             fetchTestimonials();
             resetForm();
@@ -90,7 +91,7 @@ const Testimonial = () => {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`https://artisticify-backend.vercel.app/api/testimonials/${id}`);
+            await axios.delete(`https://artisticify-backend.vercel.app/api/testimonials/deleteTestimonial/${id}`);
             fetchTestimonials();
         } catch (error) {
             console.error('Delete error:', error);

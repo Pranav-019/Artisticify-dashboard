@@ -8,7 +8,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@jitsi/react-sdk": "^1.4.0",
-    "@mui/material": "^6.4.1",
+    "@mui/material": "^6.4.11",
     "@syncfusion/ej2": "^19.4.48",
     "@syncfusion/ej2-react-calendars": "^19.4.48",
     "@syncfusion/ej2-react-charts": "^19.4.50",
